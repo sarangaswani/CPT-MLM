@@ -1,0 +1,32 @@
+@keyframes slideUp {
+    0% {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .animated-b1 {
+    animation: slideUp 0.6s ease-in-out;
+  }
+  .animated-b2 {
+    animation: slideUp 0.9s ease-in-out;
+  }
+  .animated-button {
+    animation: slideUp 0.9s ease-in-out;
+  }
+  
+  @keyframes bounce {
+    0%, 100% {
+      transform: translateY(-25%);
+      animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+    }
+    50% {
+      transform: translateY(0);
+      animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+    }
+  }
+  
