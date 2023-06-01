@@ -9,6 +9,7 @@ import Home from './Components/HeroSection/Home';
 import RegisterForm from './Components/Register/Register';
 import CompanyOverview from './Components/CompanyOverview/CompanyOverview';
 import CoreValuesSlider from './Components/CoreValues/CoreValueSlider';
+import Dashboard from './Components/Dashboard/Dashboard';
 
 
 function App() {
@@ -16,10 +17,11 @@ function App() {
     <div className="App">
      <BrowserRouter>
      {/* <Navbar/> */}
-     <Home/>
+     {/* <Home/>
      <CompanyOverview/>
      <CoreValuesSlider/>
-     <RegisterForm/>
+     <RegisterForm/> */}
+     <Dashboard/>
      <Routes>
      {/* <Route exact path='/Login' element={<RegisterForm/>}/>   */}
      {/* <Route exact path='/' element={<Home/>}/>   */}
