@@ -22,7 +22,7 @@ function App() {
         <RegisterForm />
         <Dashboard />
         <Routes>
-          {/* <Route exact path='/Login' element={<RegisterForm/>}/>   */}
+          {/* <Route exact path='/Login' element={<RegisterForm/>}/> 
           {/* <Route exact path='/' element={<Home/>}/>   */}
         </Routes>
       </BrowserRouter>
