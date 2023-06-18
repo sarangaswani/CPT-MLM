@@ -3,9 +3,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const argon2 = require("argon2");
 const jwt = require("jsonwebtoken");
-// const { connectDb, User } = require("./database");
 const secret = "./config";
-// import { secret } from "./config";
 
 const app = express();
 app.use(express.json());
