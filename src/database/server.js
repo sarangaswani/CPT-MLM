@@ -25,9 +25,11 @@ mongoose
   });
 
 const User = new mongoose.Schema({
-  username: { type: String, required: true, unique: true },
-  email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
+  email: String,
+  password: String,
+  referralCode: String,
+  referredBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+  directReferrals: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
 });
 
 async function generateUniqueRandomNumber(min, max) {
@@ -47,26 +49,65 @@ async function generateUniqueRandomNumber(min, max) {
   return randomNumber;
 }
 
+// app.post("/signup", async (req, res) => {
+//   const { username, email, password } = req.body;
+
+//   try {
+//     const existingUser = await User.findOne({ email });
+//     if (existingUser) {
+//       return res.status(400).json({ message: "Email already in use" });
+//     }
+
+//     const identificationNumber = await generateUniqueRandomNumber(
+//       1000000,
+//       9999999
+//     );
+//     const newUser = new User({
+//       username,
+//       email,
+//       password,
+//       identificationNumber,
+//     });
+//     await newUser.save();
+
+//     res.status(201).json({ message: "User created successfully" });
+//   } catch (error) {
+//     res.status(500).json({ message: "Server error" });
+//   }
+// });
+
 app.post("/signup", async (req, res) => {
-  const { username, email, password } = req.body;
+  const { email, password, referralCode } = req.body;
 
   try {
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ message: "Email already in use" });
     }
-
     const identificationNumber = await generateUniqueRandomNumber(
       1000000,
       9999999
     );
     const newUser = new User({
-      username,
       email,
       password,
-      identificationNumber,
+      referralCode: identificationNumber,
     });
+    let referrer = null;
+
+    if (referralCode) {
+      referrer = await User.findOne({ referralCode });
+      if (referrer) {
+        newUser.referredBy = referrer._id;
+      }
+    }
+
     await newUser.save();
+
+    if (referrer) {
+      referrer.directReferrals.push(newUser._id);
+      await referrer.save();
+    }
 
     res.status(201).json({ message: "User created successfully" });
   } catch (error) {
