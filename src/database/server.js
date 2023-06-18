@@ -30,6 +30,23 @@ const User = new mongoose.Schema({
   password: { type: String, required: true },
 });
 
+async function generateUniqueRandomNumber(min, max) {
+  let unique = false;
+  let randomNumber;
+
+  while (!unique) {
+    randomNumber = Math.floor(Math.random() * (max - min + 1)) + min;
+    const existingUser = await User.findOne({
+      identificationNumber: randomNumber,
+    });
+    if (!existingUser) {
+      unique = true;
+    }
+  }
+
+  return randomNumber;
+}
+
 app.post("/signup", async (req, res) => {
   const { username, email, password } = req.body;
 
@@ -39,8 +56,16 @@ app.post("/signup", async (req, res) => {
       return res.status(400).json({ message: "Email already in use" });
     }
 
-    const hashedPassword = await argon2.hash(password);
-    const newUser = new User({ username, email, password: hashedPassword });
+    const identificationNumber = await generateUniqueRandomNumber(
+      1000000,
+      9999999
+    );
+    const newUser = new User({
+      username,
+      email,
+      password,
+      identificationNumber,
+    });
     await newUser.save();
 
     res.status(201).json({ message: "User created successfully" });
