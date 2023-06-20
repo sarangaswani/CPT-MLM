@@ -1,6 +1,7 @@
 import React from 'react';
 import { Formik, Field, ErrorMessage, Form } from 'formik';
 import * as Yup from 'yup';
+import { Link } from 'react-router-dom';
 
 const validationSchema = Yup.object().shape({
   email: Yup.string().email('Invalid email address').required('Email address is required'),
@@ -12,7 +13,7 @@ export default function Example() {
     email: '',
     password: '',
   };
-
+  
   const handleSubmit = (values) => {
     // Handle form submission
     console.log(values);
@@ -43,13 +44,13 @@ export default function Example() {
                   required
                   className="block w-full rounded-md border-0 p-1.5 text-black shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 />
-                {email && <ErrorMessage name="email" component="div" className="text-red-500 text-sm" />}
+                <ErrorMessage name="email" component="div" className="text-red-500 text-sm" />
               </div>
             </div>
 
             <div>
               <div className="flex items-center justify-between">
-                <label htmlFor="password" className="block text-sm font-medium leading-6 text-black">
+                <label htmlFor="password" className="block text-sm font-medium leading-6 text-white">
                   Password
                 </label>
                 <div className="text-sm">
@@ -85,9 +86,9 @@ export default function Example() {
 
           <p className="mt-10 text-center text-sm text-gray-500">
             Not a member?{' '}
-            <a href="#" className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">
-              Start a 14 day free trial
-            </a>
+            <Link to={`/Register`} className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">
+              Sign up now!
+            </Link>
           </p>
         </div>
       </Form>

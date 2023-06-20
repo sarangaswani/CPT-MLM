@@ -1,6 +1,7 @@
 import React from "react";
 import { Formik, Field, ErrorMessage, Form } from "formik";
 import * as Yup from "yup";
+import { Link } from "react-router-dom";
 
 const validationSchema = Yup.object().shape({
   email: Yup.string()
@@ -17,7 +18,7 @@ const validationSchema = Yup.object().shape({
   phoneNumber: Yup.string().required("Phone Number is required"),
 });
 
-export default function Register() {
+export default function Register({url}) {
   const initialValues = {
     email: "",
     password: "",
@@ -33,7 +34,7 @@ export default function Register() {
   };
 
   return (
-    <section className="py-9 bg-gradient-to-br from-MiddlePurple via-customPurple to-MiddlePurple dark:bg-gradient-to-br ">
+    <section className="py-9 pt-24 bg-gradient-to-br from-customPurple via-MiddlePurple to-customPurple dark:bg-gradient-to-br ">
       <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
           <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-white">
@@ -210,12 +211,12 @@ export default function Register() {
                 </button>
                 <p className="text-sm font-light text-gray-500 dark:text-white">
                   Already have an account?{" "}
-                  <a
-                    href="#"
+                  <Link
+                    to="/SignIn"
                     className="font-medium text-primary-600 hover:underline dark:text-gray-500"
                   >
                     Login here
-                  </a>
+                  </Link>
                 </p>
               </Form>
             </Formik>

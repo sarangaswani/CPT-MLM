@@ -5,13 +5,13 @@ import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import Footer from "./Footer";
 import Main from "./Main";
 import Shop from "./Shop";
-import { Link, Routes, Route } from "react-router-dom";
+import { Link, Routes, Route} from "react-router-dom";
 
-const Dashboard = () => {
+const Dashboard = ({match}) => {
   const [Active, setActive] = useState("");
   const navigation = [
-    { name: "Dashboard", href: "/Main" },
-    { name: "Shop", href: "/Shop" },
+    { name: "Dashboard", href: `/Dashboard/Main` },
+    { name: "Shop", href: `/Dashboard/Shop` },
     { name: "e-Bank", href: "#" },
     { name: "mCash", href: "#" },
     { name: "MUSD", href: "#" },
@@ -186,8 +186,8 @@ const Dashboard = () => {
       <main>
         <div className="bg-purple-200 rounded-lg mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
           <Routes>
-            <Route exact path="/Main" element={<Main/>} />
-            <Route exact path="/Shop" element={<Shop/>} />
+            <Route  path="Main" element={<Main/>} />
+            <Route  path="Shop" element={<Shop/>} />
             {/* Add more Route components for each navigation item */}
           </Routes>
         </div>

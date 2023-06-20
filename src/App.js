@@ -3,7 +3,7 @@ import './App.css';
 import Hero from './Components/HeroSection/Hero'
 import Card from './Components/HeroSection/Card';
 import { BrowserRouter , Routes, Route } from 'react-router-dom';
-import Home from './Components/HeroSection/Home';
+import Home from './Components/Home';
 import CompanyOverview from './Components/CompanyOverview/CompanyOverview';
 import CoreValuesSlider from './Components/CoreValues/CoreValueSlider';
 import Dashboard from './Components/Dashboard/Dashboard';
@@ -21,8 +21,8 @@ function App() {
      <RegisterForm/> */}
      
      <Routes>
-     <Route exact path='/' element={<Home/>}/>  
-     <Route exact path='/Dashboard' element={<Dashboard/>}/>  
+     <Route  path='/*' element={<Home/>}/>  
+     <Route  path='/Dashboard/*' element={<Dashboard/>}/>  
      {/* <Route exact path='/' element={<Home/>}/>   */}
        
      </Routes>
