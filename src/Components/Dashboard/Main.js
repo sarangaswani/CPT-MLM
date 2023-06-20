@@ -39,7 +39,7 @@ function Main() {
   ];
   return (
     <div>
-      <div className="flex flex-col sm:flex-row gap-4 pt-4">
+      <div className="flex flex-col sm:flex-row gap-4 py-4">
       <div
     className="bg-indigo-300 p-4 w-full sm:w-1/3 flex flex-col items-center justify-center rounded-xl"
     style={{
@@ -104,14 +104,15 @@ function Main() {
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4 h-32">
         <div className="bg-blue-300 p-4 rounded-xl flex items-center pl-16">
-          <FaWallet size={32} style={{ color: "black" }} />
+          
+          <MdAccountBalance size={32} />
           <div>
             <h1 className="text-black font-semibold ml-3">e Bank</h1>
             <p className="ml-3 text-sm">Total: 0</p>
           </div>
         </div>
         <div className="bg-green-300 p-4 rounded-xl flex items-center pl-16">
-          <MdAccountBalance size={32} />
+        <FaWallet size={32} style={{ color: "black" }} />
           <div>
             <h1 className="text-black font-semibold ml-3">mCash Wallet</h1>
             <p className="ml-3 text-sm">Balance: 0.55</p>

@@ -7,7 +7,11 @@ const Navbar = () => {
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
-
+  
+  const openInNewTab = () => {
+    const newTab = window.open('/Dashboard', '_blank');
+    newTab.focus();
+  };
   return (
     <nav className="bg-transparent rounded-2xl mx-10 absolute top-4 left-0 w-11/12 z-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -19,22 +23,29 @@ const Navbar = () => {
           </div>
           <div className="hidden md:block">
             <div className="ml-4 flex items-center md:ml-6">
-              <a
-                href="/"
+              <Link
+                to="/"
                 className="text-purple-700 hover:text-white border border-purple-700 hover:bg-purple-800 focus:ring-4 focus:outline-none focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2 dark:border-purple-400 dark:text-purple-400 dark:hover:text-white dark:hover:bg-purple-500 dark:focus:ring-purple-900"
               >
                 Home
-              </a>
+              </Link>
+              <Link
+                
+                onClick={openInNewTab}
+                className="text-purple-700 hover:text-white border border-purple-700 hover:bg-purple-800 focus:ring-4 focus:outline-none focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2 dark:border-purple-400 dark:text-purple-400 dark:hover:text-white dark:hover:bg-purple-500 dark:focus:ring-purple-900"
+              >
+                Dashboard
+              </Link>
 
-              <a
-                href="/"
+              <Link
+                to="/"
                 className="text-purple-700 hover:text-white border border-purple-700 hover:bg-purple-800 focus:ring-4 focus:outline-none focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2 dark:border-purple-400 dark:text-purple-400 dark:hover:text-white dark:hover:bg-purple-500 dark:focus:ring-purple-900"
               >
                 About
-              </a>
+              </Link>
 
               <Link
-                to="/Login"
+                to="/SignIn"
                 className="text-purple-700 hover:text-white border border-purple-700 hover:bg-purple-800 focus:ring-4 focus:outline-none focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2 dark:border-purple-400 dark:text-purple-400 dark:hover:text-white dark:hover:bg-purple-500 dark:focus:ring-purple-900"
               >
                 Login
@@ -83,24 +94,31 @@ const Navbar = () => {
       </div>
       <div className={`${isMenuOpen ? "block" : "hidden"} md:hidden`}>
         <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-          <a
-            href="/"
+          <Link
+            to="/"
             className="block px-3 py-2 rounded-md text-base font-medium text-white hover:bg-gray-700 focus:outline-none focus:bg-gray-700"
           >
             Home
-          </a>
-          <a
-            href="/"
+          </Link>
+          <Link
+            to="/Dashboard"
+            onClick={openInNewTab}
+            className="block px-3 py-2 rounded-md text-base font-medium text-white hover:bg-gray-700 focus:outline-none focus:bg-gray-700"
+          >
+            Dashboard
+          </Link>
+          <Link
+            to="/Dashboard"
             className="mt-1 block px-3 py-2 rounded-md text-base font-medium text-white hover:bg-gray-700 focus:outline-none focus:bg-gray-700"
           >
             About
-          </a>
-          <a
-            href="/"
+          </Link>
+          <Link
+            to="/SignIn"
             className="mt-1 block px-3 py-2 rounded-md text-base font-medium text-white hover:bg-gray-700 focus:outline-none focus:bg-gray-700"
           >
-            Contact
-          </a>
+            Login
+          </Link>
         </div>
       </div>
     </nav>

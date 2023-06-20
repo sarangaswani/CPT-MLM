@@ -1,21 +1,24 @@
-import React from "react";
+import React, { useState } from "react";
 import { Fragment } from "react";
 import { Disclosure, Menu, Transition } from "@headlessui/react";
 import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import Footer from "./Footer";
 import Main from "./Main";
+import Shop from "./Shop";
+import { Link, Routes, Route } from "react-router-dom";
 
 const Dashboard = () => {
+  const [Active, setActive] = useState("");
   const navigation = [
-    { name: "Dashboard", href: "#", current: true },
-    { name: "Shop", href: "#", current: false },
-    { name: "e-Bank", href: "#", current: false },
-    { name: "mCash", href: "#", current: false },
-    { name: "MUSD", href: "#", current: false },
-    { name: "My Earnings", href: "#", current: false },
-    { name: "Affiliate Network", href: "#", current: false },
-    { name: "Notifications", href: "#", current: false },
-    { name: "Support", href: "#", current: false },
+    { name: "Dashboard", href: "/Main" },
+    { name: "Shop", href: "/Shop" },
+    { name: "e-Bank", href: "#" },
+    { name: "mCash", href: "#" },
+    { name: "MUSD", href: "#" },
+    { name: "My Earnings", href: "#" },
+    { name: "Affiliate Network", href: "#" },
+    { name: "Notifications", href: "#" },
+    { name: "Support", href: "#" },
   ];
 
   function classNames(...classes) {
@@ -41,7 +44,7 @@ const Dashboard = () => {
                 </div>
                 <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
                   <div className="flex flex-shrink-0 items-center">
-                    <h1 className="text-white font-bold text-2xl">
+                    <h1 className="text-white font-bold  sm:text-xs">
                       ProsperChain
                     </h1>
                   </div>
@@ -128,15 +131,16 @@ const Dashboard = () => {
                 {navigation.map((item) => (
                   <Disclosure.Button
                     key={item.name}
-                    as="a"
-                    href={item.href}
+                    as={Link}
+                          to={item.href}
                     className={classNames(
-                      item.current
+                      Active === item.name
                         ? "bg-white text-purple-950"
                         : "text-white hover:bg-white hover:text-purple-950",
                       "block rounded-md px-3 py-2 text-base font-medium"
                     )}
-                    aria-current={item.current ? "page" : undefined}
+                    onClick={() => setActive(item.name)}
+                    aria-current={Active ? "page" : undefined}
                   >
                     {item.name}
                   </Disclosure.Button>
@@ -155,19 +159,21 @@ const Dashboard = () => {
                   <div className="hidden sm:ml-6 sm:block">
                     <div className="flex space-x-4">
                       {navigation.map((item) => (
-                        <a
+                        <Disclosure.Button
                           key={item.name}
-                          href={item.href}
+                          as={Link}
+                          to={item.href}
                           className={classNames(
-                            item.current
+                            Active === item.name
                               ? "bg-white text-purple-950"
                               : "text-gray-200 hover:bg-white hover:text-purple-950",
                             "rounded-md px-3 py-2 text-sm font-medium"
                           )}
-                          aria-current={item.current ? "page" : undefined}
+                          aria-current={Active ? "page" : undefined}
+                          onClick={() => setActive(item.name)}
                         >
                           {item.name}
-                        </a>
+                        </Disclosure.Button>
                       ))}
                     </div>
                   </div>
@@ -178,8 +184,12 @@ const Dashboard = () => {
         )}
       </Disclosure>
       <main>
-        <div className="bg-purple-200 rounded-lg  mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
-          <Main />
+        <div className="bg-purple-200 rounded-lg mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
+          <Routes>
+            <Route exact path="/Main" element={<Main/>} />
+            <Route exact path="/Shop" element={<Shop/>} />
+            {/* Add more Route components for each navigation item */}
+          </Routes>
         </div>
       </main>
       <Footer />
