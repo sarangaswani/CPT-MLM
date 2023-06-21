@@ -2,6 +2,7 @@ import React from "react";
 import { Formik, Field, ErrorMessage, Form } from "formik";
 import * as Yup from "yup";
 import { Link } from "react-router-dom";
+import axios from "axios";
 
 const validationSchema = Yup.object().shape({
   email: Yup.string()
@@ -18,7 +19,7 @@ const validationSchema = Yup.object().shape({
   phoneNumber: Yup.string().required("Phone Number is required"),
 });
 
-export default function Register({url}) {
+export default function Register({ url }) {
   const initialValues = {
     email: "",
     password: "",
@@ -28,9 +29,19 @@ export default function Register({url}) {
     phoneNumber: "",
   };
 
-  const handleSubmit = (values) => {
-    // Handle form submission
-    console.log(values);
+  const handleSubmit = async (values) => {
+    try {
+      await fetch(`http://localhost:5000/signup`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(values),
+      });
+    } catch (error) {
+      console.log("Catch is called ", error);
+      // Handle the error as needed
+    }
   };
 
   return (

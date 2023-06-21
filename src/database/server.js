@@ -3,9 +3,11 @@ const express = require("express");
 const mongoose = require("mongoose");
 const argon2 = require("argon2");
 const jwt = require("jsonwebtoken");
+const cors = require("cors");
 const secret = "./config";
 
 const app = express();
+app.use(cors());
 app.use(express.json());
 
 // connectDb();
@@ -24,13 +26,15 @@ mongoose
     console.error("Error connecting to MongoDB", err);
   });
 
-const User = new mongoose.Schema({
+const UserSchema = new mongoose.Schema({
   email: String,
   password: String,
   referralCode: String,
   referredBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   directReferrals: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
 });
+
+const User = mongoose.model("User", UserSchema);
 
 async function generateUniqueRandomNumber(min, max) {
   let unique = false;
@@ -39,7 +43,7 @@ async function generateUniqueRandomNumber(min, max) {
   while (!unique) {
     randomNumber = Math.floor(Math.random() * (max - min + 1)) + min;
     const existingUser = await User.findOne({
-      identificationNumber: randomNumber,
+      referralCode: randomNumber,
     });
     if (!existingUser) {
       unique = true;
@@ -84,9 +88,12 @@ async function fetchReferrals(user, level, referrals) {
 app.post("/signup", async (req, res) => {
   const { email, password, referralCode } = req.body;
 
+  // console.log(req.body);
+
   try {
     const existingUser = await User.findOne({ email });
     if (existingUser) {
+      console.log("matched");
       return res.status(400).json({ message: "Email already in use" });
     }
     const identificationNumber = await generateUniqueRandomNumber(
@@ -96,23 +103,24 @@ app.post("/signup", async (req, res) => {
     const newUser = new User({
       email,
       password,
-      referralCode: identificationNumber,
+      referralCode: "1", // convert to a string, or change the schema to allow numbers
+      referredBy: null, // explicitly set referredBy to null
     });
     let referrer = null;
 
-    if (referralCode) {
-      referrer = await User.findOne({ referralCode });
-      if (referrer) {
-        newUser.referredBy = referrer._id;
-      }
-    }
+    // if (referralCode) {
+    //   referrer = await User.findOne({ referralCode });
+    //   if (referrer) {
+    //     newUser.referredBy = referrer._id;
+    //   }
+    // }
 
     await newUser.save();
 
-    if (referrer) {
-      referrer.directReferrals.push(newUser._id);
-      await referrer.save();
-    }
+    // if (referrer) {
+    //   referrer.directReferrals.push(newUser._id);
+    //   await referrer.save();
+    // }
 
     res.status(201).json({ message: "User created successfully" });
   } catch (error) {
@@ -141,7 +149,7 @@ app.post("/login", async (req, res) => {
   }
 });
 
-const PORT = process.env.PORT || 3000;
+const PORT = 5000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
