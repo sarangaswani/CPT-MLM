@@ -50,7 +50,7 @@ export default function Register({ url }) {
   };
 
   return (
-    <section className="py-9 pt-24 bg-gradient-to-br from-customPurple via-MiddlePurple to-customPurple dark:bg-gradient-to-br ">
+    <div className="py-9 pt-24 bg-gradient-to-br from-customPurple via-MiddlePurple to-customPurple dark:bg-gradient-to-br ">
       <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
           <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-white">
@@ -78,7 +78,7 @@ export default function Register({ url }) {
                     type="email"
                     name="email"
                     id="email"
-                    className="bg-white border-0 text-white sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5   dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 ring-1 ring-inset ring-gray-300"
+                    className="bg-white border-0 text-black sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5   dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 ring-1 ring-inset ring-gray-300"
                     placeholder="name@company.com"
                     required
                   />
@@ -100,7 +100,7 @@ export default function Register({ url }) {
                     name="password"
                     id="password"
                     placeholder="••••••••"
-                    className="bg-white border-0 ring-1 ring-inset ring-gray-300 text-white sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5   dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    className="bg-white border-0 ring-1 ring-inset ring-gray-300 text-black sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5   dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     required
                   />
                   <ErrorMessage
@@ -121,7 +121,7 @@ export default function Register({ url }) {
                     name="confirmPassword"
                     id="confirm-password"
                     placeholder="••••••••"
-                    className="bg-white border-0 ring-1 ring-inset ring-gray-300 text-white sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5   dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    className="bg-white border-0 ring-1 ring-inset ring-gray-300 text-black sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5   dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     required
                   />
                   <ErrorMessage
@@ -141,7 +141,7 @@ export default function Register({ url }) {
                     type="date"
                     name="dateOfBirth"
                     id="date-of-birth"
-                    className="bg-white border-0 ring-1 ring-inset ring-gray-300 text-white sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5   dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    className="bg-white border-0 ring-1 ring-inset ring-gray-300 text-black sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5   dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     required
                   />
                   <ErrorMessage
@@ -161,7 +161,7 @@ export default function Register({ url }) {
                     as="select"
                     name="gender"
                     id="gender"
-                    className="bg-white border-0 ring-1 ring-inset ring-gray-300 text-white sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5   dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    className="bg-white border-0 ring-1 ring-inset ring-gray-300 text-black sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5   dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     required
                   >
                     <option value="">Select Gender</option>
@@ -185,7 +185,7 @@ export default function Register({ url }) {
                     type="text"
                     name="phoneNumber"
                     id="phone-number"
-                    className="bg-white border-0 ring-1 ring-inset ring-gray-300 text-white sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5   dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    className="bg-white border-0 ring-1 ring-inset ring-gray-300 text-black sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5   dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     required
                   />
                   <ErrorMessage
@@ -200,7 +200,7 @@ export default function Register({ url }) {
                       id="terms"
                       name="terms"
                       type="checkbox"
-                      className="w-4 h-4 border-0 ring-1 ring-inset ring-gray-300 rounded bg-white focus:ring-3 focus:ring-primary-300   dark:focus:ring-primary-600 dark:ring-offset-gray-800"
+                      className="w-4 h-4 border-0 ring-1 ring-inset ring-gray-300 rounded bg-black focus:ring-3 focus:ring-primary-300  dark:focus:ring-primary-600 dark:ring-offset-gray-800"
                       required
                     />
                   </div>
@@ -223,7 +223,7 @@ export default function Register({ url }) {
                   type="submit"
                   className="w-full mt-8 inline-flex items-center justify-center p-0.5 mb-2 mr-2 overflow-hidden text-sm font-medium text-white rounded-lg group bg-gradient-to-br from-purple-600 to-blue-500 group-hover:from-purple-600 group-hover:to-blue-500 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800"
                 >
-                  <span class="w-full px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">
+                  <span class="w-full px-5 py-2.5 transition-all ease-in duration-75 bg-gray-900  rounded-md group-hover:bg-opacity-0">
                     Create an account
                   </span>
                 </button>
@@ -241,6 +241,6 @@ export default function Register({ url }) {
           </div>
         </div>
       </div>
-    </section>
+    </div>
   );
 }

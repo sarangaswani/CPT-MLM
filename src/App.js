@@ -4,11 +4,12 @@ import Hero from './Components/HeroSection/Hero'
 import Card from './Components/HeroSection/Card';
 import { BrowserRouter , Routes, Route } from 'react-router-dom';
 import Home from './Components/Home';
-import CompanyOverview from './Components/CompanyOverview/CompanyOverview';
-import CoreValuesSlider from './Components/CoreValues/CoreValueSlider';
+import Homie from './Components/HeroSection/Home'
 import Dashboard from './Components/Dashboard/Dashboard';
 import Shop from './Components/Dashboard/Shop';
 import Main from './Components/Dashboard/Main';
+import Register from './Components/Register/Register';
+
 
 function App() {
   return (
@@ -16,12 +17,12 @@ function App() {
      <BrowserRouter>
      
      {/* <Home/>
-     <CompanyOverview/>
-     <CoreValuesSlider/>
+    
      <RegisterForm/> */}
      
      <Routes>
-     <Route  path='/*' element={<Home/>}/>  
+     <Route  path="/" element={<Homie/>} />
+     <Route  path='/GetStarted/*' element={<Home/>}/>   
      <Route  path='/Dashboard/*' element={<Dashboard/>}/>  
      {/* <Route exact path='/' element={<Home/>}/>   */}
        

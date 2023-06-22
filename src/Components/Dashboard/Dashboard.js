@@ -8,9 +8,9 @@ import Shop from "./Shop";
 import { Link, Routes, Route} from "react-router-dom";
 
 const Dashboard = ({match}) => {
-  const [Active, setActive] = useState("");
+  const [Active, setActive] = useState("Dashboard");
   const navigation = [
-    { name: "Dashboard", href: `/Dashboard/Main` },
+    { name: "Dashboard", href: `/Dashboard` },
     { name: "Shop", href: `/Dashboard/Shop` },
     { name: "e-Bank", href: "#" },
     { name: "mCash", href: "#" },
@@ -186,7 +186,7 @@ const Dashboard = ({match}) => {
       <main>
         <div className="bg-purple-200 rounded-lg mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
           <Routes>
-            <Route  path="Main" element={<Main/>} />
+            <Route  path="/" element={<Main/>} />
             <Route  path="Shop" element={<Shop/>} />
             {/* Add more Route components for each navigation item */}
           </Routes>

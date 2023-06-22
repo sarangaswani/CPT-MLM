@@ -90,7 +90,7 @@ export default function Example() {
                 <div className="flex items-center justify-between">
                   <label
                     htmlFor="password"
-                    className="block text-sm font-medium leading-6 text-black"
+                    className="block text-sm font-medium leading-6 text-white"
                   >
                     Password
                   </label>
@@ -110,7 +110,7 @@ export default function Example() {
                     type="password"
                     autoComplete="current-password"
                     required
-                    className="block w-full rounded-md border-0 py-1.5 text-black shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                    className="block w-full rounded-md border-0 p-1.5 text-black shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                   />
                   <ErrorMessage
                     name="password"
@@ -125,7 +125,7 @@ export default function Example() {
                   type="submit"
                   className="w-full mt-8 inline-flex items-center justify-center p-0.5 mb-2 mr-2 overflow-hidden text-sm font-medium text-white rounded-lg group bg-gradient-to-br from-purple-600 to-blue-500 group-hover:from-purple-600 group-hover:to-blue-500 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800"
                 >
-                  <span class="w-full px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">
+                  <span class="w-full px-5 py-2.5 transition-all ease-in duration-75 bg-gray-900  rounded-md group-hover:bg-opacity-0">
                     SignIn
                   </span>
                 </button>
@@ -135,7 +135,7 @@ export default function Example() {
             <p className="mt-10 text-center text-sm text-gray-500">
               Not a member?{" "}
               <Link
-                to={`/Register`}
+                to={`/GetStarted/Register`}
                 className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500"
               >
                 Sign up now!

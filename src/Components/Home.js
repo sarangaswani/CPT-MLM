@@ -3,6 +3,7 @@ import Navbar from "../Components/Navbar/Navbar";
 import SignIn from "../Components/Register/SignIn";
 import {  Routes, Route } from "react-router-dom";
 import Register from './Register/Register'
+
 function Home() {
   
   return (
@@ -10,9 +11,9 @@ function Home() {
       <Navbar />
       <Routes>
         {/* <Route exact path='/Dashboard' element={<Dashboard/>}/>   */}
-        <Route exact path="" element={<SignIn />} />
-        <Route exact path="Register" element={<Register />} />
-        <Route exact path="SignIn" element={<SignIn />} />
+        
+        <Route  path="Register" element={<Register />} />
+        <Route  path="/" element={<SignIn />} />
 
       </Routes>
     </div>
