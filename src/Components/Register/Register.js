@@ -29,15 +29,20 @@ export default function Register({ url }) {
     phoneNumber: "",
   };
 
-  const handleSubmit = async (values) => {
+  const handleSubmit = async (values, { setFieldError }) => {
     try {
-      await fetch(`http://localhost:5000/signup`, {
+      const response = await fetch(`http://localhost:5000/signup`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(values),
       });
+
+      if (response.status === 400) {
+        const data = await response.json();
+        setFieldError("email", data.message);
+      }
     } catch (error) {
       console.log("Catch is called ", error);
       // Handle the error as needed
@@ -56,7 +61,9 @@ export default function Register({ url }) {
           <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
             <Formik
               initialValues={initialValues}
-              onSubmit={handleSubmit}
+              onSubmit={(values, { setFieldError }) =>
+                handleSubmit(values, { setFieldError })
+              }
               validationSchema={validationSchema}
             >
               <Form className="space-y-4 md:space-y-6">

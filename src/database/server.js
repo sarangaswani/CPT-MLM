@@ -30,7 +30,7 @@ const UserSchema = new mongoose.Schema({
   email: String,
   password: String,
   referralCode: String,
-  referredBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+  referredBy: String,
   directReferrals: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
 });
 
@@ -104,7 +104,7 @@ app.post("/signup", async (req, res) => {
       email,
       password,
       referralCode: "1", // convert to a string, or change the schema to allow numbers
-      referredBy: null, // explicitly set referredBy to null
+      referredBy: "0", // explicitly set referredBy to null
     });
     let referrer = null;
 
