@@ -16,16 +16,39 @@ export default function Example() {
     password: "",
   };
 
-  const handleSubmit = (values) => {
-    // Handle form submission
-    console.log(values);
+  const handleSubmit = async (values, { setFieldError }) => {
+    try {
+      const response = await fetch(`http://localhost:5000/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(values),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        if (data.error) {
+          setFieldError("email", data.error);
+        }
+      } else {
+        // handle successful login, e.g. redirect user to home page
+        // this will depend on your application's logic
+      }
+    } catch (error) {
+      console.log("Catch is called ", error);
+      // Handle the error as needed
+    }
   };
 
   return (
     <div className="h-screen bg-gradient-to-br from-customPurple via-MiddlePurple to-customPurple dark:bg-gradient-to-br">
       <Formik
         initialValues={initialValues}
-        onSubmit={handleSubmit}
+        onSubmit={(values, { setFieldError }) =>
+          handleSubmit(values, { setFieldError })
+        }
         validationSchema={validationSchema}
       >
         <Form className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8 ">
@@ -63,30 +86,6 @@ export default function Example() {
             </div>
 
             <div>
-              <div className="flex items-center justify-between">
-                <label
-                  htmlFor="password"
-                  className="block text-sm font-medium leading-6 text-white"
-                >
-                  Password
-                </label>
-                <div className="mt-2">
-                  <Field
-                    id="email"
-                    name="email"
-                    type="email"
-                    autoComplete="email"
-                    required
-                    className="block w-full rounded-md border-0 p-1.5 text-black shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                  />
-                  <ErrorMessage
-                    name="email"
-                    component="div"
-                    className="text-red-500 text-sm"
-                  />
-                </div>
-              </div>
-
               <div>
                 <div className="flex items-center justify-between">
                   <label

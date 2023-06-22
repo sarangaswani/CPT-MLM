@@ -130,19 +130,20 @@ app.post("/signup", async (req, res) => {
 
 app.post("/login", async (req, res) => {
   const { email, password } = req.body;
-
+  console.log(email, password);
   try {
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(400).json({ message: "Email not found" });
+      return res.status(400).json({ error: "Email not found" });
     }
+    console.log(user);
 
-    const isPasswordValid = await argon2.verify(user.password, password);
-    if (!isPasswordValid) {
-      return res.status(400).json({ message: "Invalid password" });
+    if (user.password !== password) {
+      return res.status(400).json({ error: "Invalid password" });
     }
-
     const token = jwt.sign({ userId: user._id }, secret, { expiresIn: "1h" });
+
+    console.log("login passed", token);
     res.status(200).json({ token, userId: user._id });
   } catch (error) {
     res.status(500).json({ message: "Server error" });
