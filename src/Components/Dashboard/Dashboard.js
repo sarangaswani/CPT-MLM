@@ -10,7 +10,11 @@ import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import Session from "react-session-api"; // Import Session
 
+import Cookies from "js-cookie";
+
 const Dashboard = ({ match }) => {
+  const token = Cookies.get("authToken");
+
   const navigate = useNavigate();
   const [Active, setActive] = useState("Dashboard");
   const navigation = [
@@ -30,10 +34,10 @@ const Dashboard = ({ match }) => {
   }
 
   useEffect(() => {
-    if (!Session.get("loggedIn")) {
+    if (!token) {
       navigate("/", { replace: true });
     }
-  }, [navigate]);
+  }, []);
   return (
     <div className="bg-gradient-to-br from-MiddlePurple via-customPurple to-MiddlePurple min-h-screen">
       <Disclosure as="nav" className="bg-transparent pt-3">

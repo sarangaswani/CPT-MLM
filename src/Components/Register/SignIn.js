@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import Session from "react-session-api"; // Import Session
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
-
+import { useEffect } from "react";
 const validationSchema = Yup.object().shape({
   email: Yup.string()
     .email("Invalid email address")
@@ -14,6 +14,7 @@ const validationSchema = Yup.object().shape({
 });
 
 export default function Example() {
+  const token = Cookies.get("authToken");
   const navigate = useNavigate();
   const initialValues = {
     email: "",
@@ -54,6 +55,11 @@ export default function Example() {
       console.log("Catch is called ", error);
     }
   };
+  useEffect(() => {
+    if (token) {
+      navigate("/Dashboard");
+    }
+  }, []);
 
   return (
     <div className="h-screen bg-gradient-to-br from-customPurple via-MiddlePurple to-customPurple dark:bg-gradient-to-br">

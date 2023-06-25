@@ -15,7 +15,7 @@ const validationSchema = Yup.object().shape({
     .oneOf([Yup.ref("password"), null], "Passwords must match")
     .required("Confirm Password is required"),
   dateOfBirth: Yup.date().required("Date of Birth is required"),
-  gender: Yup.string().required("Gender is required"),
+  refferalCode: Yup.string().required("Refferal Code is required"),
   phoneNumber: Yup.string().required("Phone Number is required"),
 });
 
@@ -25,7 +25,7 @@ export default function Register({ url }) {
     password: "",
     confirmPassword: "",
     dateOfBirth: "",
-    gender: "",
+    refferalCode: "",
     phoneNumber: "",
   };
 
@@ -152,24 +152,20 @@ export default function Register({ url }) {
                 </div>
                 <div>
                   <label
-                    htmlFor="gender"
+                    htmlFor="refferalCode"
                     className="block mb-2 text-sm font-medium text-white dark:text-white"
                   >
-                    Gender
+                    Refferal Code
                   </label>
                   <Field
-                    as="select"
-                    name="gender"
-                    id="gender"
+                    type="number"
+                    name="refferalCode"
+                    id="refferalCode"
                     className="bg-white border-0 ring-1 ring-inset ring-gray-300 text-black sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5   dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     required
-                  >
-                    <option value="">Select Gender</option>
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                  </Field>
+                  />
                   <ErrorMessage
-                    name="gender"
+                    name="refferalCode"
                     component="div"
                     className="text-red-500 text-sm"
                   />
