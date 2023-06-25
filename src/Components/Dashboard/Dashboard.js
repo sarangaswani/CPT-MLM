@@ -5,9 +5,13 @@ import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import Footer from "./Footer";
 import Main from "./Main";
 import Shop from "./Shop";
-import { Link, Routes, Route} from "react-router-dom";
+import { Link, Routes, Route } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import Session from "react-session-api"; // Import Session
 
-const Dashboard = ({match}) => {
+const Dashboard = ({ match }) => {
+  const navigate = useNavigate();
   const [Active, setActive] = useState("Dashboard");
   const navigation = [
     { name: "Dashboard", href: `/Dashboard` },
@@ -24,6 +28,12 @@ const Dashboard = ({match}) => {
   function classNames(...classes) {
     return classes.filter(Boolean).join(" ");
   }
+
+  useEffect(() => {
+    if (!Session.get("loggedIn")) {
+      navigate("/", { replace: true });
+    }
+  }, [navigate]);
   return (
     <div className="bg-gradient-to-br from-MiddlePurple via-customPurple to-MiddlePurple min-h-screen">
       <Disclosure as="nav" className="bg-transparent pt-3">
@@ -132,7 +142,7 @@ const Dashboard = ({match}) => {
                   <Disclosure.Button
                     key={item.name}
                     as={Link}
-                          to={item.href}
+                    to={item.href}
                     className={classNames(
                       Active === item.name
                         ? "bg-white text-purple-950"
@@ -186,8 +196,8 @@ const Dashboard = ({match}) => {
       <main>
         <div className="bg-purple-200 rounded-lg mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
           <Routes>
-            <Route  path="/" element={<Main/>} />
-            <Route  path="Shop" element={<Shop/>} />
+            <Route path="/" element={<Main />} />
+            <Route path="Shop" element={<Shop />} />
             {/* Add more Route components for each navigation item */}
           </Routes>
         </div>

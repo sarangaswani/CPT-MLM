@@ -2,6 +2,9 @@ import React from "react";
 import { Formik, Field, ErrorMessage, Form } from "formik";
 import * as Yup from "yup";
 import { Link } from "react-router-dom";
+import Session from "react-session-api"; // Import Session
+import { useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
 
 const validationSchema = Yup.object().shape({
   email: Yup.string()
@@ -11,6 +14,7 @@ const validationSchema = Yup.object().shape({
 });
 
 export default function Example() {
+  const navigate = useNavigate();
   const initialValues = {
     email: "",
     password: "",
@@ -33,12 +37,21 @@ export default function Example() {
           setFieldError("email", data.error);
         }
       } else {
-        // handle successful login, e.g. redirect user to home page
-        // this will depend on your application's logic
+        const token = data.token; // Assuming the token is sent as "token" in the response
+        Cookies.set("authToken", token, {
+          expires: 7,
+          secure: true,
+          sameSite: "strict",
+        });
+
+        Session.set("user", data.user);
+        Session.set("loggedIn", true);
+
+        // Redirect to Dashboard
+        navigate("/Dashboard");
       }
     } catch (error) {
       console.log("Catch is called ", error);
-      // Handle the error as needed
     }
   };
 
