@@ -86,7 +86,7 @@ async function fetchReferrals(user, level, referrals) {
 // ---------------------------------------------------------------------------- //
 
 app.post("/signup", async (req, res) => {
-  const { email, password, referralCode } = req.body;
+  const { email, password, refferalCode } = req.body;
 
   // console.log(req.body);
 
@@ -103,27 +103,38 @@ app.post("/signup", async (req, res) => {
     const newUser = new User({
       email,
       password,
-      referralCode: "1", // convert to a string, or change the schema to allow numbers
-      referredBy: "0", // explicitly set referredBy to null
+      referralCode: identificationNumber, // convert to a string, or change the schema to allow numbers
+      referredBy: refferalCode.toString(), // explicitly set referredBy to null
     });
     let referrer = null;
 
-    // if (referralCode) {
-    //   referrer = await User.findOne({ referralCode });
-    //   if (referrer) {
-    //     newUser.referredBy = referrer._id;
-    //   }
-    // }
+    if (refferalCode) {
+      ref = refferalCode.toString();
+      referrer = await User.findOne({ ref });
+      if (referrer) {
+        newUser.referredBy = referrer._id;
+      }
+    } else {
+      console.log("can not find ", refferalCode, " user");
+    }
 
     await newUser.save();
 
-    // if (referrer) {
-    //   referrer.directReferrals.push(newUser._id);
-    //   await referrer.save();
-    // }
+    if (referrer) {
+      referrer.directReferrals.push(newUser._id);
+      await referrer.save();
+    } else {
+      console.log(
+        "can not find ",
+        refferalCode,
+        " user where referrer is",
+        referrer
+      );
+    }
 
     res.status(201).json({ message: "User created successfully" });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: "Server error" });
   }
 });

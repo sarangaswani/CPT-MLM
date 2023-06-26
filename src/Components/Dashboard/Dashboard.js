@@ -37,7 +37,7 @@ const Dashboard = ({ match }) => {
     if (!token) {
       navigate("/", { replace: true });
     }
-  }, []);
+  }, [token]);
   return (
     <div className="bg-gradient-to-br from-MiddlePurple via-customPurple to-MiddlePurple min-h-screen">
       <Disclosure as="nav" className="bg-transparent pt-3">
@@ -123,7 +123,10 @@ const Dashboard = ({ match }) => {
                         <Menu.Item>
                           {({ active }) => (
                             <a
-                              href="/"
+                              onClick={() => {
+                                Cookies.remove("authToken");
+                                navigate("/", { replace: true });
+                              }}
                               className={classNames(
                                 active ? "bg-gray-100" : "",
                                 "block px-4 py-2 text-sm text-gray-700"

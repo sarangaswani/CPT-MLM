@@ -1,8 +1,7 @@
 import React from "react";
 import { Formik, Field, ErrorMessage, Form } from "formik";
 import * as Yup from "yup";
-import { Link } from "react-router-dom";
-import axios from "axios";
+import { Link, useLocation } from "react-router-dom";
 
 const validationSchema = Yup.object().shape({
   email: Yup.string()
@@ -14,22 +13,26 @@ const validationSchema = Yup.object().shape({
   confirmPassword: Yup.string()
     .oneOf([Yup.ref("password"), null], "Passwords must match")
     .required("Confirm Password is required"),
-  dateOfBirth: Yup.date().required("Date of Birth is required"),
   refferalCode: Yup.string().required("Refferal Code is required"),
   phoneNumber: Yup.string().required("Phone Number is required"),
 });
 
 export default function Register({ url }) {
+  // Extract referral code from the query parameters
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const referralCode = queryParams.get("ref") || ""; // Default to empty string if not provided
+
   const initialValues = {
     email: "",
     password: "",
     confirmPassword: "",
-    dateOfBirth: "",
-    refferalCode: "",
+    refferalCode: referralCode, // Prefill referral code
     phoneNumber: "",
   };
 
   const handleSubmit = async (values, { setFieldError }) => {
+    console.log(values);
     try {
       const response = await fetch(`http://localhost:5000/signup`, {
         method: "POST",
@@ -48,7 +51,6 @@ export default function Register({ url }) {
       // Handle the error as needed
     }
   };
-
   return (
     <div className="py-9 pt-24 bg-gradient-to-br from-customPurple via-MiddlePurple to-customPurple dark:bg-gradient-to-br ">
       <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
@@ -130,26 +132,7 @@ export default function Register({ url }) {
                     className="text-red-500 text-sm"
                   />
                 </div>
-                <div>
-                  <label
-                    htmlFor="date-of-birth"
-                    className="block mb-2 text-sm font-medium text-white dark:text-white"
-                  >
-                    Date of Birth
-                  </label>
-                  <Field
-                    type="date"
-                    name="dateOfBirth"
-                    id="date-of-birth"
-                    className="bg-white border-0 ring-1 ring-inset ring-gray-300 text-black sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5   dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    required
-                  />
-                  <ErrorMessage
-                    name="dateOfBirth"
-                    component="div"
-                    className="text-red-500 text-sm"
-                  />
-                </div>
+
                 <div>
                   <label
                     htmlFor="refferalCode"
@@ -163,6 +146,7 @@ export default function Register({ url }) {
                     id="refferalCode"
                     className="bg-white border-0 ring-1 ring-inset ring-gray-300 text-black sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5   dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     required
+                    disabled={!!referralCode}
                   />
                   <ErrorMessage
                     name="refferalCode"
