@@ -49,6 +49,21 @@ export default function Example() {
         Session.set("loggedIn", true);
         console.log("user data", data.user);
 
+        const valuese = {
+          email: "wasee62313@gmail.com",
+        };
+
+        // fetch("http://localhost:5000/direct-referrals", {  // call this in direct referrals page
+        //   method: "POST",
+        //   headers: {
+        //     "Content-Type": "application/json",
+        //   },
+        //   body: JSON.stringify(valuese),
+        // })
+        //   .then((response) => response.json())
+        //   .then((data) => console.log(data))
+        //   .catch((error) => console.error(error));
+
         // Redirect to Dashboard
         navigate("/Dashboard");
       }
