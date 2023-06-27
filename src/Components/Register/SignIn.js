@@ -47,6 +47,7 @@ export default function Example() {
 
         Session.set("user", data.user);
         Session.set("loggedIn", true);
+        console.log("user data", data.user);
 
         // Redirect to Dashboard
         navigate("/Dashboard");

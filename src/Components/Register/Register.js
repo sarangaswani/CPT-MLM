@@ -2,8 +2,10 @@ import React from "react";
 import { Formik, Field, ErrorMessage, Form } from "formik";
 import * as Yup from "yup";
 import { Link, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const validationSchema = Yup.object().shape({
+  fullName: Yup.string().required("Full name is required"),
   email: Yup.string()
     .email("Invalid email address")
     .required("Email is required"),
@@ -13,27 +15,30 @@ const validationSchema = Yup.object().shape({
   confirmPassword: Yup.string()
     .oneOf([Yup.ref("password"), null], "Passwords must match")
     .required("Confirm Password is required"),
-  refferalCode: Yup.string().required("Refferal Code is required"),
+  referralCode: Yup.string().required("Refferal Code is required"),
   phoneNumber: Yup.string().required("Phone Number is required"),
 });
 
 export default function Register({ url }) {
+  const navigate = useNavigate();
   // Extract referral code from the query parameters
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const referralCode = queryParams.get("ref") || ""; // Default to empty string if not provided
 
   const initialValues = {
+    fullName: "",
     email: "",
     password: "",
     confirmPassword: "",
-    refferalCode: referralCode, // Prefill referral code
+    referralCode: referralCode, // Prefill referral code
     phoneNumber: "",
   };
 
   const handleSubmit = async (values, { setFieldError }) => {
     console.log(values);
     try {
+      // values.referralCode = String(values.referralCode);
       const response = await fetch(`http://localhost:5000/signup`, {
         method: "POST",
         headers: {
@@ -42,9 +47,14 @@ export default function Register({ url }) {
         body: JSON.stringify(values),
       });
 
-      if (response.status === 400) {
-        const data = await response.json();
-        setFieldError("email", data.message);
+      const data = await response.json();
+
+      if (!response.ok) {
+        if (data.error) {
+          setFieldError("referralCode", data.error);
+        }
+      } else {
+        navigate("/");
       }
     } catch (error) {
       console.log("Catch is called ", error);
@@ -69,6 +79,27 @@ export default function Register({ url }) {
               validationSchema={validationSchema}
             >
               <Form className="space-y-4 md:space-y-6">
+                <div>
+                  <label
+                    htmlFor="fullName"
+                    className="block mb-2 text-sm font-medium text-white dark:text-white"
+                  >
+                    Full Name
+                  </label>
+                  <Field
+                    type="text"
+                    name="fullName"
+                    id="fullName"
+                    className="bg-white border-0 text-black sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5   dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    placeholder="Your Full Name"
+                    required
+                  />
+                  <ErrorMessage
+                    name="fullName"
+                    component="div"
+                    className="text-red-500 text-sm"
+                  />
+                </div>
                 <div>
                   <label
                     htmlFor="email"
@@ -135,21 +166,21 @@ export default function Register({ url }) {
 
                 <div>
                   <label
-                    htmlFor="refferalCode"
+                    htmlFor="referralCode"
                     className="block mb-2 text-sm font-medium text-white dark:text-white"
                   >
                     Refferal Code
                   </label>
                   <Field
                     type="number"
-                    name="refferalCode"
-                    id="refferalCode"
+                    name="referralCode"
+                    id="referralCode"
                     className="bg-white border-0 ring-1 ring-inset ring-gray-300 text-black sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5   dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     required
                     disabled={!!referralCode}
                   />
                   <ErrorMessage
-                    name="refferalCode"
+                    name="referralCode"
                     component="div"
                     className="text-red-500 text-sm"
                   />

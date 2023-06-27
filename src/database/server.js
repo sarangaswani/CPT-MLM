@@ -27,11 +27,12 @@ mongoose
   });
 
 const UserSchema = new mongoose.Schema({
+  fullName: String,
   email: String,
   password: String,
   referralCode: String,
   referredBy: String,
-  directReferrals: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+  directReferrals: [String],
 });
 
 const User = mongoose.model("User", UserSchema);
@@ -50,7 +51,7 @@ async function generateUniqueRandomNumber(min, max) {
     }
   }
 
-  return randomNumber;
+  return randomNumber.toString();
 }
 
 // ------------------------------------------------------------------------ //
@@ -85,54 +86,40 @@ async function fetchReferrals(user, level, referrals) {
 
 // ---------------------------------------------------------------------------- //
 
+const findUser = async (refCode) => {
+  const user = await User.findOne({ referralCode: refCode });
+  console.log(user);
+  return user;
+};
+
 app.post("/signup", async (req, res) => {
-  const { email, password, refferalCode } = req.body;
-
-  // console.log(req.body);
-
+  const { fullName, email, password, referralCode } = req.body;
+  console.log(req.body);
   try {
+    // findUser(refCode);
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      console.log("matched");
       return res.status(400).json({ message: "Email already in use" });
+    }
+    const referrer = await User.findOne({ referralCode: referralCode });
+    if (!referrer) {
+      return res.status(400).json({ message: "Referral code does not exist" });
     }
     const identificationNumber = await generateUniqueRandomNumber(
       1000000,
       9999999
     );
     const newUser = new User({
+      fullName,
       email,
       password,
-      referralCode: identificationNumber, // convert to a string, or change the schema to allow numbers
-      referredBy: refferalCode.toString(), // explicitly set referredBy to null
+      referralCode: identificationNumber,
+      referredBy: referralCode, // referredBy will be referrer's _id
     });
-    let referrer = null;
-
-    if (refferalCode) {
-      ref = refferalCode.toString();
-      referrer = await User.findOne({ ref });
-      if (referrer) {
-        newUser.referredBy = referrer._id;
-      }
-    } else {
-      console.log("can not find ", refferalCode, " user");
-    }
-
     await newUser.save();
-
-    if (referrer) {
-      referrer.directReferrals.push(newUser._id);
-      await referrer.save();
-    } else {
-      console.log(
-        "can not find ",
-        refferalCode,
-        " user where referrer is",
-        referrer
-      );
-    }
-
-    res.status(201).json({ message: "User created successfully" });
+    referrer.directReferrals.push(identificationNumber);
+    await referrer.save();
+    res.status(200).json({ message: "User created successfully" });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error" });
@@ -155,7 +142,27 @@ app.post("/login", async (req, res) => {
     const token = jwt.sign({ userId: user._id }, secret, { expiresIn: "1h" });
 
     console.log("login passed", token);
-    res.status(200).json({ token, userId: user._id });
+
+    // Creating a sanitized user object to send in the response
+    const sanitizedUser = {
+      email: user.email,
+      referralCode: user.referralCode,
+      referredBy: user.referredBy,
+      directReferrals: user.directReferrals,
+    };
+
+    res.status(200).json({ token, userId: user._id, user: sanitizedUser });
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+app.post("/getMyDirectAffiliate", async (req, res) => {
+  const { email } = req.body;
+  try {
+    const user = await User.findOne({ email });
+
+    res.json(user);
   } catch (error) {
     res.status(500).json({ message: "Server error" });
   }

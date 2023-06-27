@@ -36,6 +36,8 @@ const Dashboard = ({ match }) => {
   useEffect(() => {
     if (!token) {
       navigate("/", { replace: true });
+    } else {
+      console.log(token);
     }
   }, [token]);
   return (
