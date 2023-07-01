@@ -211,8 +211,9 @@ app.post("/login", async (req, res) => {
       package: user.package,
     };
 
-    const directRef = await getDirectReferrals(user.email);
-    console.log(directRef);
+    // const directRef = await getDirectReferrals(user.email);
+    await getRefff(user.email);
+    // console.log(directRef);
 
     res.status(200).json({ token, userId: user._id, user: sanitizedUser });
   } catch (error) {
