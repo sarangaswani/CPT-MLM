@@ -1,12 +1,12 @@
-import React from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faStar } from '@fortawesome/free-solid-svg-icons';
+import React from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faStar } from "@fortawesome/free-solid-svg-icons";
 
 const ProductCard = ({ product }) => {
-  const decsLines = product.decs.split('\n');
+  const decsLines = product.decs.split("\n");
 
   return (
-    <div className="w-full max-w-md sm:max-w-md bg-white rounded-2xl shadow-2xl">
+    <div className="w-11/12 max-w-md sm:max-w-md bg-white rounded-2xl shadow-2xl">
       <div className="flex items-center justify-center p-20">
         {product.image}
       </div>
@@ -40,7 +40,9 @@ const ProductCard = ({ product }) => {
 const ProductList = () => {
   const products = [
     {
-      image: <FontAwesomeIcon icon={faStar} className="w-10 h-10 text-green-400" />,
+      image: (
+        <FontAwesomeIcon icon={faStar} className="w-10 h-10 text-green-400" />
+      ),
       title: "Standard Package",
       rating: 5,
       decs: `1000 Seo Points
@@ -54,7 +56,9 @@ Affiliate Programme benefits
       color: "bg-green-500",
     },
     {
-      image: <FontAwesomeIcon icon={faStar} className="w-10 h-10 text-red-500" />,
+      image: (
+        <FontAwesomeIcon icon={faStar} className="w-10 h-10 text-red-500" />
+      ),
       title: "Platinum Package",
       rating: 5,
       decs: `2000 Seo Points
@@ -68,7 +72,9 @@ Affiliate Programme benefits
       color: "bg-red-500",
     },
     {
-      image: <FontAwesomeIcon icon={faStar} className="w-10 h-10 text-yellow-400" />,
+      image: (
+        <FontAwesomeIcon icon={faStar} className="w-10 h-10 text-yellow-400" />
+      ),
       title: "Exclusive Package",
       rating: 5,
       decs: `5000 Seo Points
@@ -84,13 +90,11 @@ Affiliate Programme benefits
   ];
 
   return (
-    <div className=' rounded-xl '>
-    <div className='grid grid-cols-2 place-items-center gap-9 py-4 '>
-      {products.map((product, index) => (
-        <ProductCard key={index} product={product} />
-      ))}
-    </div>
-    </div>
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-9 py-4 place-items-center">
+    {products.map((product, index) => (
+      <ProductCard key={index} product={product} />
+    ))}
+  </div>
   );
 };
 

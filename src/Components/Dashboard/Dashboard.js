@@ -9,10 +9,10 @@ import { Link, Routes, Route } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import Session from "react-session-api"; // Import Session
-import { SelectorIcon } from "@heroicons/react/solid";
 
 import Cookies from "js-cookie";
 import DirectAffiliate from "./DirectAffiliate";
+import AffiliateDownline from "./AffiliateDownline";
 
 const Dashboard = ({ match }) => {
   const token = Cookies.get("authToken");
@@ -35,8 +35,14 @@ const Dashboard = ({ match }) => {
       name: "Affiliate Network",
       href: "#",
       subitems: [
-        { name: "Direct Affiliate", href: "/Dashboard/Affiliate-Network/Direct-Affiliate" },
-        { name: "Affiliate Downline", href: "#" },
+        {
+          name: "Direct Affiliate",
+          href: "/Dashboard/Affiliate-Network/Direct-Affiliate",
+        },
+        {
+          name: "Affiliate Downline",
+          href: "/Dashboard/Affiliate-Network/Affiliate-Downline",
+        },
       ],
     },
     { name: "Notifications", href: "#" },
@@ -62,7 +68,7 @@ const Dashboard = ({ match }) => {
             <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
               <div className="relative flex h-16 items-center justify-between">
                 <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
-                  {/* Mobile menu button*/}
+                  {/* Mobile menu button */}
                   <Disclosure.Button className="inline-flex items-center justify-center rounded-md p-2 text-gray-100 hover:bg-white hover:text-purple-950 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
                     <span className="sr-only">Open main menu</span>
                     {open ? (
@@ -74,7 +80,7 @@ const Dashboard = ({ match }) => {
                 </div>
                 <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
                   <div className="flex flex-shrink-0 items-center">
-                    <h1 className="text-white font-bold  sm:text-xs">
+                    <h1 className="text-white font-bold sm:text-xs">
                       ProsperChain
                     </h1>
                   </div>
@@ -82,7 +88,7 @@ const Dashboard = ({ match }) => {
                 <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
                   <button
                     type="button"
-                    className="rounded-full bg-transparent p-1 text-white hover:text-purple-950  hover:bg-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
+                    className="rounded-full bg-transparent p-1 text-white hover:text-purple-950 hover:bg-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
                   >
                     <span className="sr-only">View notifications</span>
                     <BellIcon className="h-6 w-6" aria-hidden="true" />
@@ -160,26 +166,88 @@ const Dashboard = ({ match }) => {
             </div>
 
             <Disclosure.Panel className="sm:hidden">
-              <div className="space-y-1 px-2 pb-3 pt-2">
-                {navigation.map((item) => (
-                  <Disclosure.Button
-                    key={item.name}
-                    as={Link}
-                    to={item.href}
-                    className={classNames(
-                      Active === item.name
-                        ? "bg-white text-purple-950"
-                        : "text-white hover:bg-white hover:text-purple-950",
-                      "block rounded-md px-3 py-2 text-base font-medium"
-                    )}
-                    onClick={() => setActive(item.name)}
-                    aria-current={Active ? "page" : undefined}
-                  >
-                    {item.name}
-                  </Disclosure.Button>
-                ))}
+  <div className="space-y-1 px-2 pb-3 pt-2">
+    {navigation.map((item) => (
+      <Fragment key={item.name}>
+        {item.subitems ? (
+          <>
+            <Disclosure.Button
+              as={Link}
+              to={item.href}
+              className={classNames(
+                Active === item.name
+                  ? "bg-white text-purple-950"
+                  : "text-white hover:bg-white hover:text-purple-950",
+                "block rounded-md px-3 py-2 text-sm font-medium"
+              )}
+              onClick={() => {
+                setActive(item.name);
+                setIsOpen((prevOpen) =>
+                  prevOpen === item.name ? false : true
+                );
+              }}
+            >
+              <div className="flex items-center justify-between">
+                <span>{item.name}</span>
               </div>
-            </Disclosure.Panel>
+            </Disclosure.Button>
+            {isOpen && (
+              <Transition
+                as={Fragment}
+                enter="transition ease-out duration-100"
+                enterFrom="transform opacity-0 scale-95"
+                enterTo="transform opacity-100 scale-100"
+                leave="transition ease-in duration-75"
+                leaveFrom="transform opacity-100 scale-100"
+                leaveTo="transform opacity-0 scale-95"
+              >
+                <Disclosure.Panel>
+                  <div className="py-1">
+                    {item.subitems.map((subitem) => (
+                      <Link
+                        key={subitem.name}
+                        to={subitem.href}
+                        className={classNames(
+                          Active === subitem.name
+                            ? "bg-white text-purple-950"
+                            : "text-gray-200 hover:bg-white hover:text-purple-950",
+                          "block rounded-md px-3 py-2 text-sm font-medium"
+                        )}
+                        onClick={() => {setActive(subitem.name)
+                        open =false
+                        }}
+                      >
+                        {subitem.name}
+                      </Link>
+                    ))}
+                  </div>
+                </Disclosure.Panel>
+              </Transition>
+            )}
+          </>
+        ) : (
+          <Disclosure.Button
+            as={Link}
+            to={item.href}
+            className={classNames(
+              Active === item.name
+                ? "bg-white text-purple-950"
+                : "text-white hover:bg-white hover:text-purple-950",
+              "block rounded-md px-3 py-2 text-base font-medium"
+            )}
+            onClick={() => {
+              setActive(item.name);
+              setIsOpen(false);
+            }}
+            aria-current={Active ? "page" : undefined}
+          >
+            {item.name}
+          </Disclosure.Button>
+        )}
+      </Fragment>
+    ))}
+  </div>
+</Disclosure.Panel>
           </>
         )}
       </Disclosure>
@@ -208,7 +276,6 @@ const Dashboard = ({ match }) => {
                                     onClick={() => setActive(item.name)}
                                   >
                                     {item.name}
-                                   
                                   </Menu.Button>
                                 </div>
                                 <Transition
@@ -222,8 +289,8 @@ const Dashboard = ({ match }) => {
                                   leaveTo="transform opacity-0 scale-95"
                                 >
                                   <Menu.Items
-                                    
-                                    className=" absolute right-[17rem] top-12  mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
+                                    static
+                                    className="absolute right-[17rem] top-12 z-20  mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
                                   >
                                     <div className="py-1">
                                       {item.subitems.map((subitem) => (
@@ -236,7 +303,9 @@ const Dashboard = ({ match }) => {
                                                   ? "bg-gray-100 text-gray-900"
                                                   : "text-gray-700"
                                               } block px-4 py-2 text-sm`}
-                                              onClick={() => setActive(item.name)}
+                                              onClick={() =>
+                                                setActive(item.name)
+                                              }
                                             >
                                               {subitem.name}
                                             </a>
@@ -276,12 +345,21 @@ const Dashboard = ({ match }) => {
       </Disclosure>
       <main>
         <div className="bg-purple-200 rounded-lg mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
-          <Routes>
-            <Route path="/" element={<Main />} />
-            <Route path="Shop" element={<Shop />} />
-            <Route path="Affiliate-Network/Direct-Affiliate" element={<DirectAffiliate />} />
-            {/* Add more Route components for each navigation item */}
-          </Routes>
+          <div className="px-4 sm:px-0">
+            <Routes>
+              <Route path="/" element={<Main />} />
+              <Route path="Shop" element={<Shop />} />
+              <Route
+                path="Affiliate-Network/Direct-Affiliate"
+                element={<DirectAffiliate />}
+              />
+              <Route
+                path="Affiliate-Network/Affiliate-Downline"
+                element={<AffiliateDownline />}
+              />
+              {/* Add more Route components for each navigation item */}
+            </Routes>
+          </div>
         </div>
       </main>
       <Footer />
