@@ -9,11 +9,18 @@ import { Link, Routes, Route } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import Session from "react-session-api"; // Import Session
+import { SelectorIcon } from "@heroicons/react/solid";
 
 import Cookies from "js-cookie";
+import DirectAffiliate from "./DirectAffiliate";
 
 const Dashboard = ({ match }) => {
   const token = Cookies.get("authToken");
+  const [isOpen, setIsOpen] = useState(false);
+
+  const toggleDropdown = () => {
+    setIsOpen(!isOpen);
+  };
 
   const navigate = useNavigate();
   const [Active, setActive] = useState("Dashboard");
@@ -24,7 +31,14 @@ const Dashboard = ({ match }) => {
     { name: "mCash", href: "#" },
     { name: "MUSD", href: "#" },
     { name: "My Earnings", href: "#" },
-    { name: "Affiliate Network", href: "#" },
+    {
+      name: "Affiliate Network",
+      href: "#",
+      subitems: [
+        { name: "Direct Affiliate", href: "/Dashboard/Affiliate-Network/Direct-Affiliate" },
+        { name: "Affiliate Downline", href: "#" },
+      ],
+    },
     { name: "Notifications", href: "#" },
     { name: "Support", href: "#" },
   ];
@@ -177,23 +191,81 @@ const Dashboard = ({ match }) => {
                 <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-center">
                   <div className="hidden sm:ml-6 sm:block">
                     <div className="flex space-x-4">
-                      {navigation.map((item) => (
-                        <Disclosure.Button
-                          key={item.name}
-                          as={Link}
-                          to={item.href}
-                          className={classNames(
-                            Active === item.name
-                              ? "bg-white text-purple-950"
-                              : "text-gray-200 hover:bg-white hover:text-purple-950",
-                            "rounded-md px-3 py-2 text-sm font-medium"
-                          )}
-                          aria-current={Active ? "page" : undefined}
-                          onClick={() => setActive(item.name)}
-                        >
-                          {item.name}
-                        </Disclosure.Button>
-                      ))}
+                      {navigation.map((item) =>
+                        item.subitems ? (
+                          <Menu key={item.name}>
+                            {({ open }) => (
+                              <>
+                                <div>
+                                  <Menu.Button
+                                    className={classNames(
+                                      Active === item.name
+                                        ? "bg-white text-purple-950"
+                                        : "text-gray-200 hover:bg-white hover:text-purple-950",
+                                      "rounded-md px-3 py-2 text-sm font-medium"
+                                    )}
+                                    aria-current={Active ? "page" : undefined}
+                                    onClick={() => setActive(item.name)}
+                                  >
+                                    {item.name}
+                                   
+                                  </Menu.Button>
+                                </div>
+                                <Transition
+                                  show={open}
+                                  as={Fragment}
+                                  enter="transition ease-out duration-100"
+                                  enterFrom="transform opacity-0 scale-95"
+                                  enterTo="transform opacity-100 scale-100"
+                                  leave="transition ease-in duration-75"
+                                  leaveFrom="transform opacity-100 scale-100"
+                                  leaveTo="transform opacity-0 scale-95"
+                                >
+                                  <Menu.Items
+                                    
+                                    className=" absolute right-[17rem] top-12  mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
+                                  >
+                                    <div className="py-1">
+                                      {item.subitems.map((subitem) => (
+                                        <Menu.Item key={subitem.name}>
+                                          {({ active }) => (
+                                            <a
+                                              href={subitem.href}
+                                              className={`${
+                                                active
+                                                  ? "bg-gray-100 text-gray-900"
+                                                  : "text-gray-700"
+                                              } block px-4 py-2 text-sm`}
+                                              onClick={() => setActive(item.name)}
+                                            >
+                                              {subitem.name}
+                                            </a>
+                                          )}
+                                        </Menu.Item>
+                                      ))}
+                                    </div>
+                                  </Menu.Items>
+                                </Transition>
+                              </>
+                            )}
+                          </Menu>
+                        ) : (
+                          <a
+                            key={item.name}
+                            href={item.href}
+                            className={classNames(
+                              Active === item.name
+                                ? "bg-white text-purple-950"
+                                : "text-gray-200 hover:bg-white hover:text-purple-950",
+                              "rounded-md px-3 py-2 text-sm font-medium"
+                            )}
+                            aria-current={Active ? "page" : undefined}
+                            onClick={() => setActive(item.name)}
+                          >
+                            {item.name}
+                          </a>
+                        )
+                      )}
                     </div>
                   </div>
                 </div>
@@ -207,6 +279,7 @@ const Dashboard = ({ match }) => {
           <Routes>
             <Route path="/" element={<Main />} />
             <Route path="Shop" element={<Shop />} />
+            <Route path="Affiliate-Network/Direct-Affiliate" element={<DirectAffiliate />} />
             {/* Add more Route components for each navigation item */}
           </Routes>
         </div>

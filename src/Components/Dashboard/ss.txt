@@ -1,0 +1,30 @@
+ <tbody>
+            {content.map((user, index) => (
+              <tr key={index} className="bg-transparent text-black">
+                <th
+                  scope="row"
+                  className="flex items-center px-6 py-4 text-gray-900 whitespace-nowrap"
+                >
+                  {user.imageUrl}
+                  <div className="pl-3">
+                    <div className="text-base font-semibold">{user.name}</div>
+                    <div className="font-normal text-gray-500">{user.decs}</div>
+                  </div>
+                </th>
+                <td className="px-6 py-4">{user.position}</td>
+                <td className="px-6 py-4">
+                  <div className="flex items-center">{user.label}</div>
+                </td>
+                <td className="px-6 py-4">{user.members}</td>
+                <td className="px-6 py-4">
+                  <button className="flex items-center justify-center px-4 py-2 bg-transparent hover:bg-blue-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-opacity-50">
+                    <FontAwesomeIcon
+                      icon={faChevronRight}
+                      color="#000000"
+                      size="md"
+                    />
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
