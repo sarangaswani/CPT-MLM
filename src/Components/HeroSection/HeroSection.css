@@ -29,4 +29,10 @@
       animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
     }
   }
+
+  /* .hero-image{
+    object-fit: cover;
+    -webkit-mask-image: linear-gradient(black,transparent) ;
+    mask-image: linear-gradient(black,transparent);
+  } */
   

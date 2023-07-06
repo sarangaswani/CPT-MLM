@@ -57,16 +57,16 @@ const CoreValuesSlider = () => {
   };
 
   return (
-    <div className="bg-gradient-to-br from-customPurple via-MiddlePurple to-customPurple min-h-screen py-10 px-4 sm:px-6 lg:px-8">
-      <h1 className="mt-[38rem] text-3xl sm:text-4xl font-bold mb-6 text-white text-center">
+    <div className="bg-gradient-to-br from-customPurple via-MiddlePurple to-customPurple py-20 px-4 sm:px-6 lg:px-8">
+      <h1 className="text-3xl sm:text-4xl font-bold mb-6 text-white text-center">
         Core Values
       </h1>
-      <div className="mt-10 bg-transparent rounded-lg p-8 sm:p-10 text-white items-center">
+      <div className="bg-transparent rounded-lg p-8 sm:p-10 text-white items-center">
         <Slider {...sliderSettings}>
           {coreValues.map((coreValue, index) => (
             <div key={index} className="p-4">
-              <div className="bg-transparent rounded-lg shadow-xl p-6">
-                <div className="ml-4">
+              <div className="bg-transparent rounded-lg shadow-2xl p-6">
+                <div className="ml-4 h-auto sm:h-48">
                   <h2 className="text-2xl font-bold mb-4">{coreValue.title}</h2>
                   <p className="text-lg mb-8">{coreValue.description}</p>
                 </div>

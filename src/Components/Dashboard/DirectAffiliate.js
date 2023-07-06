@@ -70,7 +70,7 @@ function DirectAffiliate() {
             <AiOutlineLineChart className="w-6 h-6" />
             Direct Affiliate
           </h1>
-          <div className="flex flex-col sm:flex-row items-center">
+          <div className="flex flex-col gap-3 sm:flex-row items-center">
             <DropdownButton name="All Packages" />
             <form
               className="flex items-center mt-4 sm:mt-0"
