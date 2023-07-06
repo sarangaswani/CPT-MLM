@@ -317,7 +317,7 @@ app.post("/all-referrals", async (req, res) => {
     // Traverse multiple levels of downline
     let level = 1;
     let referralsToTraverse = directReferralObjects;
-    while (level <= user.directReferrals.length) {
+    while (level <= user.directReferrals.length - 1) {
       const nextReferrals = [];
 
       for (const referral of referralsToTraverse) {
