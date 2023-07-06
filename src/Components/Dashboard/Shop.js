@@ -1,9 +1,29 @@
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faStar } from "@fortawesome/free-solid-svg-icons";
+import Cookies from "js-cookie";
 
 const ProductCard = ({ product }) => {
   const decsLines = product.decs.split("\n");
+
+  const handleBuyNow = async () => {
+    const userData = Cookies.get("user");
+    var currentUser = JSON.parse(userData);
+    const values = {
+      userId: currentUser.email,
+      amount: 100,
+      package: "Premium",
+    };
+    const response = await fetch(`http://localhost:5000/invest`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(values),
+    });
+    const data = await response.json();
+    console.log(data, response);
+  };
 
   return (
     <div className="w-11/12 max-w-md sm:max-w-md bg-white rounded-2xl shadow-2xl">
@@ -22,15 +42,13 @@ const ProductCard = ({ product }) => {
           ))}
         </div>
         <div className="flex items-center justify-between">
-          <span className="text-3xl font-bold text-black">
-            {product.price}
-          </span>
-          <a
-            href="/"
+          <span className="text-3xl font-bold text-black">{product.price}</span>
+          <button
+            onClick={handleBuyNow}
             className={`text-white ${product.color} hover:bg-${product.color}-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center`}
           >
             Buy Now
-          </a>
+          </button>
         </div>
       </div>
     </div>
@@ -91,10 +109,10 @@ Affiliate Programme benefits
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-9 py-4 place-items-center">
-    {products.map((product, index) => (
-      <ProductCard key={index} product={product} />
-    ))}
-  </div>
+      {products.map((product, index) => (
+        <ProductCard key={index} product={product} />
+      ))}
+    </div>
   );
 };
 

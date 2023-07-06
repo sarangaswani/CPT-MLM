@@ -7,10 +7,9 @@ import Shop from "./Shop";
 import { Link, Routes, Route } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import Session from "react-session-api"; // Import Session
-import Cookies from "js-cookie";
 import DirectAffiliate from "./DirectAffiliate";
 import AffiliateDownline from "./AffiliateDownline";
+import Cookies from "js-cookie";
 import MobileMenu from "./MobileMenu";
 import NavButtons from "./NavButtons";
 import DesktopMenu from "./DesktopMenu";
@@ -20,6 +19,8 @@ import RequestWithdrawal from "./RequestWithdrawal";
 
 const Dashboard = ({ match }) => {
   const token = Cookies.get("authToken");
+  const userData = Cookies.get("user");
+  var data2 = JSON.parse(userData);
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleDropdown = () => {
@@ -81,6 +82,7 @@ const Dashboard = ({ match }) => {
     if (!token) {
       navigate("/", { replace: true });
     } else {
+      console.log(data2);
       console.log(token);
     }
   }, [token]);

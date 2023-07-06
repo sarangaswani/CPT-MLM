@@ -45,6 +45,12 @@ export default function Example() {
           sameSite: "strict",
         });
 
+        Cookies.set("user", JSON.stringify(data.user), {
+          expires: 7,
+          secure: true,
+          sameSite: "strict",
+        });
+
         Session.set("user", data.user);
         Session.set("loggedIn", true);
         console.log("user data", data.user);

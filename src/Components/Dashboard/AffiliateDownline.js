@@ -2,10 +2,16 @@ import React, { useState } from "react";
 import { FaNetworkWired, FaUsers } from "react-icons/fa";
 import DropdownButton from "./Dropdown";
 import { AiOutlineLineChart } from "react-icons/ai";
+import Cookies from "js-cookie";
+import { useEffect } from "react";
 
 function AffiliateDownline() {
   const [searchTerm, setSearchTerm] = useState("");
-
+  const userData = Cookies.get("user");
+  const [allReferrals, setallReferrals] = useState([]);
+  const [paid, setPaid] = useState();
+  const [unPaid, setUnPaid] = useState();
+  var currentUser = JSON.parse(userData);
   const handleChange = (e) => {
     setSearchTerm(e.target.value);
   };
@@ -15,6 +21,27 @@ function AffiliateDownline() {
     // Perform search logic or API call here
     console.log("Search term:", searchTerm);
   };
+  const fetchDirectAff = async () => {
+    const values = {
+      email: currentUser.email,
+    };
+    const response = await fetch(`http://localhost:5000/all-referrals`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(values),
+    });
+    const data = await response.json();
+    setallReferrals(data.allReferralObjects);
+    setPaid(data.nonNullPackageCount);
+    setUnPaid(data.nullPackageCount);
+    console.log(data);
+  };
+
+  useEffect(() => {
+    fetchDirectAff();
+  }, []);
 
   const products = [
     {
@@ -75,21 +102,21 @@ function AffiliateDownline() {
             <FaUsers size={24} color="gray" />
             <div className="ml-3">
               <h1 className="text-black font-semibold">Total Downline</h1>
-              <p className="text-sm">0</p>
+              <p className="text-sm">{allReferrals.length}</p>
             </div>
           </div>
           <div className="bg-white p-4 rounded-xl flex items-center">
             <FaUsers size={24} color="green" />
             <div className="ml-3">
               <h1 className="text-black font-semibold">Paid Downline</h1>
-              <p className="text-sm">0</p>
+              <p className="text-sm">{paid}</p>
             </div>
           </div>
           <div className="bg-white p-4 rounded-xl flex items-center">
             <FaUsers size={24} color="red" />
             <div className="ml-3">
               <h1 className="text-black font-semibold">Un-Paid Downline</h1>
-              <p className="text-sm">0</p>
+              <p className="text-sm">{unPaid}</p>
             </div>
           </div>
         </div>
@@ -101,14 +128,12 @@ function AffiliateDownline() {
             <thead className="text-xs text-black uppercase bg-white dark:bg-white dark:text-black">
               <tr>
                 <th scope="col" className="px-4 py-3 sm:px-6 sm:py-3">
-                  Username
+                  ID
                 </th>
                 <th scope="col" className="px-4 py-3 sm:px-6 sm:py-3">
                   Name
                 </th>
-                <th scope="col" className="px-4 py-3 sm:px-6 sm:py-3">
-                  Referral
-                </th>
+
                 <th scope="col" className="px-4 py-3 sm:px-6 sm:py-3">
                   Downline Level
                 </th>
@@ -121,7 +146,7 @@ function AffiliateDownline() {
               </tr>
             </thead>
             <tbody>
-              {products.map((product, index) => (
+              {allReferrals.map((product, index) => (
                 <tr
                   key={index}
                   className="bg-white border-b dark:bg-white border-gray-300"
@@ -130,21 +155,17 @@ function AffiliateDownline() {
                     scope="row"
                     className="px-4 py-4 sm:px-6 sm:py-4 font-medium text-black whitespace-nowrap dark:text-black"
                   >
-                    {product.username}
+                    {product.referralCode}
                   </th>
-                  <td className="px-4 py-4 sm:px-6 sm:py-4">{product.name}</td>
                   <td className="px-4 py-4 sm:px-6 sm:py-4">
-                    {product.referral}
+                    {product.fullName}
                   </td>
-                  <td className="px-4 py-4 sm:px-6 sm:py-4">
-                    {product.downlinelevel}
-                  </td>
+
+                  <td className="px-4 py-4 sm:px-6 sm:py-4">{product.level}</td>
                   <td className="px-4 py-4 sm:px-6 sm:py-4">
                     {product.package}
                   </td>
-                  <td className="px-4 py-4 sm:px-6 sm:py-4">
-                    {product.registrationdate}
-                  </td>
+                  <td className="px-4 py-4 sm:px-6 sm:py-4">"TO BE ADDED"</td>
                 </tr>
               ))}
             </tbody>
