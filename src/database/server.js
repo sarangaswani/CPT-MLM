@@ -34,24 +34,28 @@ const UserSchema = new mongoose.Schema({
   referredBy: String,
   directReferrals: [String],
   package: String,
+  referralEarning: { type: Number, default: 0 },
+  balance: { type: Number, default: 0 },
+  referralBonusEvents: [
+    {
+      time: { type: Date, default: Date.now },
+      amount: Number,
+      referralCode: String,
+      package: String,
+      level: Number,
+      Earned: Number,
+    },
+  ],
+  dailyStackingEvents: [
+    {
+      time: { type: Date, default: Date.now },
+      amount: Number,
+      Description: String,
+    },
+  ],
 });
 
 const User = mongoose.model("User", UserSchema);
-
-const TransactionSchema = new mongoose.Schema({
-  time: { type: Date, default: Date.now },
-  amount: Number,
-});
-const dailyStakingProfitSchema = new mongoose.Schema({
-  referralCode: String,
-  transactions: [TransactionSchema],
-  totalEarnedFromStaking: Number,
-  PackageAmount: Number,
-});
-const dailyStaking = mongoose.model(
-  "StakingDailyProfit",
-  dailyStakingProfitSchema
-);
 
 async function generateUniqueRandomNumber(min, max) {
   let unique = false;
@@ -70,84 +74,69 @@ async function generateUniqueRandomNumber(min, max) {
   return randomNumber.toString();
 }
 
-// ------------------------------------------------------------------------ //
-//                  FUNCTIONS TO IMPLEMENT
-
 // ---------------------------CALL THIS FUNCTION FOR DAILY STAKING PROFIT------------------------------------//
 
-// -> THIS FUNCTION WILL ADD OBJECT ELEMENT WITH TIME AND 0.5% OF PACKAGE AMOUNT.
-const addStakingProfit = async (referralCode) => {
-  try {
-    // Find the document with the given referralCode
-    const stakingProfit = await dailyStaking.findOne({
-      referralCode: referralCode,
-    });
+// --------------------------------WHEN USER WILL INVEST THIS API WILL BE CALLED-------------------------------------------- //
+const handleInvestment = async (userId, investmentAmount, userPackage) => {
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new Error("User not found");
+  }
 
-    if (!stakingProfit) {
-      console.log(`No document found with referralCode ${referralCode}`);
-      return;
+  // Start with the direct referrer
+  let currentReferralCode = user.referredBy;
+  let level = 1;
+
+  // Define the percentage to be rewarded for each level
+  const referralPercentages = {
+    1: 0.1,
+    2: 0.04,
+    3: 0.03,
+    4: 0.02,
+    5: 0.01,
+  };
+
+  while (currentReferralCode && level <= 15) {
+    const referrer = await User.findOne({ referralCode: currentReferralCode });
+    if (!referrer) {
+      break;
     }
 
-    // Calculate daily profit
-    const dailyProfit = 0.005 * stakingProfit.PackageAmount;
+    // Only reward the user if they have the necessary number of direct referrals
+    if (referrer.directReferrals.length >= level) {
+      const percentage = level > 5 ? 0.01 : referralPercentages[level];
+      const reward = investmentAmount * percentage;
 
-    // Create a new transaction
-    const newTransaction = {
-      time: new Date(),
-      amount: dailyProfit,
-    };
+      referrer.referralBonusEvents.push({
+        time: new Date(),
+        amount: investmentAmount,
+        referralCode: userId,
+        package: userPackage,
+        level: level,
+        Earned: reward,
+      });
 
-    // Add the new transaction to the transactions array
-    stakingProfit.transactions.push(newTransaction);
+      referrer.referralEarning += reward;
+      await referrer.save();
+    }
 
-    // Update totalEarnedFromStaking
-    stakingProfit.totalEarnedFromStaking += dailyProfit;
-
-    // Save the updated document
-    await stakingProfit.save();
-
-    console.log("Staking profit added successfully");
-  } catch (error) {
-    console.error(error);
+    // Move up to the next referrer in the chain
+    currentReferralCode = referrer.referredBy;
+    level += 1;
   }
 };
-
-// ----------------------------------------
-async function getReferralsByLevel(referralCode) {
-  const referrer = await User.findOne({ referralCode });
-  if (!referrer) {
-    throw new Error("Referrer not found");
-  }
-
-  let referrals = [];
-  await fetchReferrals(referrer, 1, referrals);
-
-  const groupedReferrals = referrals.reduce((acc, referral) => {
-    if (!acc[referral.level]) {
-      acc[referral.level] = [];
-    }
-    acc[referral.level].push(referral.email);
-    return acc;
-  }, {});
-
-  return groupedReferrals;
-}
-
-async function fetchReferrals(user, level, referrals) {
-  await user.populate("directReferrals").execPopulate();
-  for (const referral of user.directReferrals) {
-    referrals.push({ email: referral.email, level });
-    await fetchReferrals(referral, level + 1, referrals);
-  }
-}
 
 // ---------------------------------------------------------------------------- //
-
-const findUser = async (refCode) => {
-  const user = await User.findOne({ referralCode: refCode });
-  console.log(user);
-  return user;
-};
+app.post("/invest", async (req, res) => {
+  const { userId, amount } = req.body;
+  try {
+    await handleInvestment(userId, amount);
+    res.status(200).json({ message: "Investment successful" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
 
 app.post("/signup", async (req, res) => {
   const { fullName, email, password, referralCode } = req.body;
