@@ -37,6 +37,7 @@ const UserSchema = new mongoose.Schema({
   referralEarning: { type: Number, default: 0 }, // this is will be dollers
   balance: { type: Number, default: 0 }, // this is the amount invested and it will be in doller
   balanceinCpt: { type: Number, default: 0 }, // this is the amount that is earned and that can be withdrawn/
+  joinningDate: { type: Date, default: Date.now },
   referralBonusEvents: [
     // this is array of object, it will store all the invited users when they will join using current user refferalCode
     {
@@ -198,6 +199,7 @@ app.post("/signup", async (req, res) => {
       referralCode: identificationNumber,
       referredBy: referralCode, // referredBy will be referrer's _id
       package: "Null",
+      joinningDate: new Date(),
     });
     await newUser.save();
     referrer.directReferrals.push(identificationNumber);
