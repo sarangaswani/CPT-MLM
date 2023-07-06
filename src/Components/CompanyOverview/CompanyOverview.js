@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import VisibilitySensor from "react-visibility-sensor";
+import React from "react";
 import "./slideInAnimation.css";
 
 const CompanyOverview = () => {
@@ -26,16 +25,10 @@ const CompanyOverview = () => {
     },
   ];
 
-  const [isVisible, setIsVisible] = useState(false);
-
-  const handleVisibilityChange = () => {
-    setIsVisible(isVisible);
-  };
-
   return (
-    <div className="relative bg-gradient-to-br from-MiddlePurple via-customPurple to-MiddlePurple min-h-screen py-10 px-4 sm:px-6 lg:px-8">
-      <div className=" bg-transparent rounded-lg shadow-lg p-8 sm:p-10 text-white">
-        <h1 className={`text-3xl sm:text-4xl mt-16 font-bold mb-6 slide-in`}>
+    <div className="relative bg-gradient-to-br from-MiddlePurple via-customPurple to-MiddlePurple pt-10 pb-6 px-4 sm:px-6 lg:px-8">
+      <div className="bg-transparent rounded-lg p-8 sm:p-10 text-white">
+        <h1 className="text-3xl sm:text-4xl mt-16 font-bold mb-6 slide-in">
           Prosperchain - Driving Innovation in Web3 Technology
         </h1>
         <p className="mt-10 max-w-8xl text-lg mb-8 slide-in">
@@ -47,29 +40,28 @@ const CompanyOverview = () => {
           of business needs to deliver impactful solutions that empower
           individuals and organizations in the decentralized ecosystem.
         </p>
-        <h2 className="absolute top-[60rem] left-20  transform -translate-y-1/2 text-4xl font-bold mb-4 text-white text-center ml-10">
-          Our Services
-        </h2>
-
-        <div className=" absolute right-16 top-[29rem] max-w-4xl grid  place-items-center gap-8">
-          {services.map((service, index) => (
-            <VisibilitySensor key={index} onChange={handleVisibilityChange}>
-              {({ isVisible }) => (
+        <div className="flex flex-col mt-28 sm:flex-row">
+          <div className="w-full sm:w-1/2 flex items-center sm:pl-40">
+            <h2 className="text-4xl font-bold mb-4 text-white text-center">
+              Our Services
+            </h2>
+          </div>
+          <div className="w-full sm:w-1/2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+              {services.map((service, index) => (
                 <div
-                  className={`border border-gray-200 rounded p-6 ${
-                    isVisible
-                      ? "transition-opacity ease-out duration-500 opacity-100"
-                      : "opacity-0"
-                  }`}
+                  key={index}
+                  className="border border-gray-200 rounded p-6 transition-opacity ease-out duration-500 opacity-100"
                 >
                   <h3 className="text-xl font-semibold mb-2">
                     {service.title}
                   </h3>
                   <p className="text-base mb-4">{service.description}</p>
+ 
                 </div>
-              )}
-            </VisibilitySensor>
-          ))}
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </div>
