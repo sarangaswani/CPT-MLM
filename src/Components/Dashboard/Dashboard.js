@@ -8,14 +8,14 @@ import Shop from "./Shop";
 import { Link, Routes, Route } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import Session from "react-session-api"; // Import Session
-
-import Cookies from "js-cookie";
 import DirectAffiliate from "./DirectAffiliate";
 import AffiliateDownline from "./AffiliateDownline";
+import Cookies from "js-cookie";
 
 const Dashboard = ({ match }) => {
   const token = Cookies.get("authToken");
+  const userData = Cookies.get("user");
+  var data2 = JSON.parse(userData);
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleDropdown = () => {
@@ -57,6 +57,7 @@ const Dashboard = ({ match }) => {
     if (!token) {
       navigate("/", { replace: true });
     } else {
+      console.log(data2);
       console.log(token);
     }
   }, [token]);
@@ -166,88 +167,89 @@ const Dashboard = ({ match }) => {
             </div>
 
             <Disclosure.Panel className="sm:hidden">
-  <div className="space-y-1 px-2 pb-3 pt-2">
-    {navigation.map((item) => (
-      <Fragment key={item.name}>
-        {item.subitems ? (
-          <>
-            <Disclosure.Button
-              as={Link}
-              to={item.href}
-              className={classNames(
-                Active === item.name
-                  ? "bg-white text-purple-950"
-                  : "text-white hover:bg-white hover:text-purple-950",
-                "block rounded-md px-3 py-2 text-sm font-medium"
-              )}
-              onClick={() => {
-                setActive(item.name);
-                setIsOpen((prevOpen) =>
-                  prevOpen === item.name ? false : true
-                );
-              }}
-            >
-              <div className="flex items-center justify-between">
-                <span>{item.name}</span>
-              </div>
-            </Disclosure.Button>
-            {isOpen && (
-              <Transition
-                as={Fragment}
-                enter="transition ease-out duration-100"
-                enterFrom="transform opacity-0 scale-95"
-                enterTo="transform opacity-100 scale-100"
-                leave="transition ease-in duration-75"
-                leaveFrom="transform opacity-100 scale-100"
-                leaveTo="transform opacity-0 scale-95"
-              >
-                <Disclosure.Panel>
-                  <div className="py-1">
-                    {item.subitems.map((subitem) => (
-                      <Link
-                        key={subitem.name}
-                        to={subitem.href}
-                        className={classNames(
-                          Active === subitem.name
-                            ? "bg-white text-purple-950"
-                            : "text-gray-200 hover:bg-white hover:text-purple-950",
-                          "block rounded-md px-3 py-2 text-sm font-medium"
+              <div className="space-y-1 px-2 pb-3 pt-2">
+                {navigation.map((item) => (
+                  <Fragment key={item.name}>
+                    {item.subitems ? (
+                      <>
+                        <Disclosure.Button
+                          as={Link}
+                          to={item.href}
+                          className={classNames(
+                            Active === item.name
+                              ? "bg-white text-purple-950"
+                              : "text-white hover:bg-white hover:text-purple-950",
+                            "block rounded-md px-3 py-2 text-sm font-medium"
+                          )}
+                          onClick={() => {
+                            setActive(item.name);
+                            setIsOpen((prevOpen) =>
+                              prevOpen === item.name ? false : true
+                            );
+                          }}
+                        >
+                          <div className="flex items-center justify-between">
+                            <span>{item.name}</span>
+                          </div>
+                        </Disclosure.Button>
+                        {isOpen && (
+                          <Transition
+                            as={Fragment}
+                            enter="transition ease-out duration-100"
+                            enterFrom="transform opacity-0 scale-95"
+                            enterTo="transform opacity-100 scale-100"
+                            leave="transition ease-in duration-75"
+                            leaveFrom="transform opacity-100 scale-100"
+                            leaveTo="transform opacity-0 scale-95"
+                          >
+                            <Disclosure.Panel>
+                              <div className="py-1">
+                                {item.subitems.map((subitem) => (
+                                  <Link
+                                    key={subitem.name}
+                                    to={subitem.href}
+                                    className={classNames(
+                                      Active === subitem.name
+                                        ? "bg-white text-purple-950"
+                                        : "text-gray-200 hover:bg-white hover:text-purple-950",
+                                      "block rounded-md px-3 py-2 text-sm font-medium"
+                                    )}
+                                    onClick={() => {
+                                      setActive(subitem.name);
+                                      open = false;
+                                    }}
+                                  >
+                                    {subitem.name}
+                                  </Link>
+                                ))}
+                              </div>
+                            </Disclosure.Panel>
+                          </Transition>
                         )}
-                        onClick={() => {setActive(subitem.name)
-                        open =false
+                      </>
+                    ) : (
+                      <Disclosure.Button
+                        as={Link}
+                        to={item.href}
+                        className={classNames(
+                          Active === item.name
+                            ? "bg-white text-purple-950"
+                            : "text-white hover:bg-white hover:text-purple-950",
+                          "block rounded-md px-3 py-2 text-base font-medium"
+                        )}
+                        onClick={() => {
+                          setActive(item.name);
+                          setIsOpen(false);
                         }}
+                        aria-current={Active ? "page" : undefined}
                       >
-                        {subitem.name}
-                      </Link>
-                    ))}
-                  </div>
-                </Disclosure.Panel>
-              </Transition>
-            )}
-          </>
-        ) : (
-          <Disclosure.Button
-            as={Link}
-            to={item.href}
-            className={classNames(
-              Active === item.name
-                ? "bg-white text-purple-950"
-                : "text-white hover:bg-white hover:text-purple-950",
-              "block rounded-md px-3 py-2 text-base font-medium"
-            )}
-            onClick={() => {
-              setActive(item.name);
-              setIsOpen(false);
-            }}
-            aria-current={Active ? "page" : undefined}
-          >
-            {item.name}
-          </Disclosure.Button>
-        )}
-      </Fragment>
-    ))}
-  </div>
-</Disclosure.Panel>
+                        {item.name}
+                      </Disclosure.Button>
+                    )}
+                  </Fragment>
+                ))}
+              </div>
+            </Disclosure.Panel>
           </>
         )}
       </Disclosure>

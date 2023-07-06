@@ -30,13 +30,15 @@ const UserSchema = new mongoose.Schema({
   fullName: String,
   email: String,
   password: String,
-  referralCode: String,
-  referredBy: String,
-  directReferrals: [String],
+  referralCode: String, // referralCode of current user
+  referredBy: String, // referralCode of the user who invited current user
+  directReferrals: [String], // all level 1 referrals
   package: String,
-  referralEarning: { type: Number, default: 0 },
-  balance: { type: Number, default: 0 },
+  referralEarning: { type: Number, default: 0 }, // this is will be dollers
+  balance: { type: Number, default: 0 }, // this is the amount invested and it will be in doller
+  balanceinCpt: { type: Number, default: 0 }, // this is the amount that is earned and that can be withdrawn/
   referralBonusEvents: [
+    // this is array of object, it will store all the invited users when they will join using current user refferalCode
     {
       time: { type: Date, default: Date.now },
       amount: Number,
@@ -47,6 +49,7 @@ const UserSchema = new mongoose.Schema({
     },
   ],
   dailyStackingEvents: [
+    // this will store daily staking
     {
       time: { type: Date, default: Date.now },
       amount: Number,
@@ -76,12 +79,43 @@ async function generateUniqueRandomNumber(min, max) {
 
 // ---------------------------CALL THIS FUNCTION FOR DAILY STAKING PROFIT------------------------------------//
 
+const processDailyStakingRewards = async () => {
+  try {
+    const users = await User.find({ package: { $ne: null } }).exec();
+
+    for (const user of users) {
+      const balance = user.balance;
+      const rewardAmount = balance * 0.005 * 20;
+
+      user.balanceinCpt += rewardAmount;
+      user.dailyStackingEvents.push({
+        time: new Date(),
+        amount: rewardAmount,
+        Description: "Daily staking reward",
+      });
+
+      await user.save();
+    }
+
+    console.log("Daily staking rewards processed successfully.");
+  } catch (err) {
+    console.error("Error processing daily staking rewards:", err);
+  }
+};
+
+// Call the function after 24 hours
+setTimeout(processDailyStakingRewards, 24 * 60 * 60 * 1000);
+
 // --------------------------------WHEN USER WILL INVEST THIS API WILL BE CALLED-------------------------------------------- //
 const handleInvestment = async (userId, investmentAmount, userPackage) => {
-  const user = await User.findById(userId);
+  const user = await User.findOne({ email: userId });
+
   if (!user) {
     throw new Error("User not found");
   }
+  user.balance += investmentAmount;
+  user.package = userPackage;
+  await user.save();
 
   // Start with the direct referrer
   let currentReferralCode = user.referredBy;
@@ -116,7 +150,8 @@ const handleInvestment = async (userId, investmentAmount, userPackage) => {
         Earned: reward,
       });
 
-      referrer.referralEarning += reward;
+      referrer.referralEarning += reward; // it is in $
+      referrer.balanceinCpt += reward * 20; //  directly it will be in the user account
       await referrer.save();
     }
 
@@ -128,9 +163,10 @@ const handleInvestment = async (userId, investmentAmount, userPackage) => {
 
 // ---------------------------------------------------------------------------- //
 app.post("/invest", async (req, res) => {
-  const { userId, amount } = req.body;
+  console.log(req.body);
+  const { userId, amount, package } = req.body;
   try {
-    await handleInvestment(userId, amount);
+    await handleInvestment(userId, amount, package);
     res.status(200).json({ message: "Investment successful" });
   } catch (error) {
     console.error(error);
@@ -245,6 +281,80 @@ app.post("/direct-referrals", async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+// ----------------------- get All Affiliate ----------------------------- //
+
+app.post("/all-referrals", async (req, res) => {
+  const { email } = req.body;
+  let allReferralObjects = [];
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const directReferrals = user.directReferrals;
+
+    // Retrieve referral objects for the direct referrals of the user
+    let directReferralObjects = await User.find(
+      {
+        referralCode: { $in: directReferrals },
+      },
+      "referralCode fullName package directReferrals"
+    ).exec();
+
+    // Add level information to each referral object
+    directReferralObjects = directReferralObjects.map((obj) => ({
+      ...obj._doc,
+      level: 1,
+    }));
+
+    allReferralObjects.push(...directReferralObjects);
+    // Traverse multiple levels of downline
+    let level = 1;
+    let referralsToTraverse = directReferralObjects;
+    while (level <= user.directReferrals.length) {
+      const nextReferrals = [];
+
+      for (const referral of referralsToTraverse) {
+        const referralCodes = referral.directReferrals;
+
+        let referralObjects = await User.find(
+          {
+            referralCode: { $in: referralCodes },
+          },
+          "referralCode fullName package directReferrals"
+        ).exec();
+
+        referralObjects = referralObjects.map((obj) => ({
+          ...obj._doc,
+          level: level,
+        }));
+
+        allReferralObjects.push(...referralObjects);
+
+        nextReferrals.push(...referralObjects);
+      }
+
+      referralsToTraverse = nextReferrals;
+      level++;
+    }
+
+    const nullPackageCount = allReferralObjects.reduce(
+      (count, obj) => (obj.package === "Null" ? count + 1 : count),
+      0
+    );
+    const nonNullPackageCount = allReferralObjects.length - nullPackageCount;
+
+    res.json({
+      allReferralObjects,
+      nullPackageCount,
+      nonNullPackageCount,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: "Internal server error" });
   }
 });
 
