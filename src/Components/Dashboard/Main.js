@@ -10,22 +10,27 @@ import {
   MdCardGiftcard,
   MdAttachMoney,
 } from "react-icons/md";
+import { getGlobalState } from "../../store/global";
 import { FiSend } from "react-icons/fi";
+import Cookies from "js-cookie";
 
 function Main() {
+  const userData = Cookies.get("user");
+  var data2 = JSON.parse(userData);
+  const allRef = getGlobalState("allReferralsLength");
   const content = [
     {
       name: "Direct Affiliate",
       decs: "On my 1st Level",
       label: "Total",
-      members: "0 Members",
+      members: `${data2.directReferrals.length} Members `,
       imageUrl: <FiSend size={24} color="black" style={{ fill: "black" }} />,
     },
     {
       name: "Affiliate Network",
       decs: "My Team Network",
       label: "Team Count",
-      members: "0 Members",
+      members: `${allRef} Members`,
       imageUrl: <FontAwesomeIcon icon={faPaperPlane} size="xl" />,
     },
     {
@@ -108,22 +113,22 @@ function Main() {
         <div className="bg-blue-300 p-4 rounded-xl flex items-center">
           <MdAccountBalance size={32} />
           <div className="ml-3">
-            <h1 className="text-black font-semibold">e Bank</h1>
-            <p className="text-sm">Total: 0</p>
+            <h1 className="text-black font-semibold">Invested Amount</h1>
+            <p className="text-sm">Total: {data2.balanceinDoll}$</p>
           </div>
         </div>
         <div className="bg-green-300 p-4 rounded-xl flex items-center">
           <FaWallet size={32} style={{ color: "black" }} />
           <div className="ml-3">
-            <h1 className="text-black font-semibold">mCash Wallet</h1>
-            <p className="text-sm">Balance: 0.55</p>
+            <h1 className="text-black font-semibold">WEB3 Wallet</h1>
+            <p className="text-sm">Balance: {data2.balanceinCpt} CPT</p>
           </div>
         </div>
         <div className="bg-yellow-300 p-4 rounded-xl flex items-center">
           <MdCardGiftcard size={32} />
           <div className="ml-3">
             <h1 className="text-black font-semibold">My Package</h1>
-            <p className="text-sm">Starter</p>
+            <p className="text-sm">{data2.package}</p>
           </div>
         </div>
       </div>

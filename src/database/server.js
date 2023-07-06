@@ -38,6 +38,7 @@ const UserSchema = new mongoose.Schema({
   balance: { type: Number, default: 0 }, // this is the amount invested and it will be in doller
   balanceinCpt: { type: Number, default: 0 }, // this is the amount that is earned and that can be withdrawn/
   joinningDate: { type: Date, default: Date.now },
+  totalEarning: Number,
   referralBonusEvents: [
     // this is array of object, it will store all the invited users when they will join using current user refferalCode
     {
@@ -236,6 +237,9 @@ app.post("/login", async (req, res) => {
       referredBy: user.referredBy,
       directReferrals: user.directReferrals,
       package: user.package,
+      balanceinCpt: user.balanceinCpt,
+      balanceinDoll: user.balance,
+      totalEarning: user.totalEarning,
     };
 
     // const directRef = await getDirectReferrals(user.email);
@@ -349,11 +353,12 @@ app.post("/all-referrals", async (req, res) => {
       0
     );
     const nonNullPackageCount = allReferralObjects.length - nullPackageCount;
-
+    const allRefLength = allReferralObjects.length;
     res.json({
       allReferralObjects,
       nullPackageCount,
       nonNullPackageCount,
+      allRefLength,
     });
   } catch (error) {
     return res.status(500).json({ message: "Internal server error" });

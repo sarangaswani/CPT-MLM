@@ -11,11 +11,13 @@ import { useEffect } from "react";
 import DirectAffiliate from "./DirectAffiliate";
 import AffiliateDownline from "./AffiliateDownline";
 import Cookies from "js-cookie";
+import { getGlobalState } from "../../store/global";
 
 const Dashboard = ({ match }) => {
   const token = Cookies.get("authToken");
   const userData = Cookies.get("user");
   var data2 = JSON.parse(userData);
+  const allRef = getGlobalState("allReferralsLength");
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleDropdown = () => {
@@ -57,8 +59,8 @@ const Dashboard = ({ match }) => {
     if (!token) {
       navigate("/", { replace: true });
     } else {
-      console.log(data2);
-      console.log(token);
+      // console.log(data2);
+      console.log(allRef);
     }
   }, [token]);
   return (

@@ -12,14 +12,40 @@ import Register from "./Components/Register/Register";
 import { useEffect, useState } from "react";
 import Session from "react-session-api"; // Import Session
 import Cookies from "js-cookie";
+import { setGlobalState } from "./store/global";
 
 function App() {
   const [loggedIn, setLoggedIn] = useState(false);
+  const userData = Cookies.get("user");
+  var data2 = JSON.parse(userData);
+  const fetchDirectAff = async () => {
+    const values = {
+      email: data2.email,
+    };
+    const response = await fetch(`http://localhost:5000/all-referrals`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(values),
+    });
+    const data = await response.json();
+    setGlobalState("allReferralsLength", data.allRefLength);
+    setGlobalState("paid", data.nonNullPackageCount);
+    setGlobalState("unpaid", data.nullPackageCount);
+
+    // setallReferrals(data.allReferralObjects);
+    // setPaid(data.nonNullPackageCount);
+    // setUnPaid(data.nullPackageCount);
+    console.log(data);
+  };
+
   useEffect(() => {
     const checkLoginStatus = () => {
       const token = Cookies.get("authToken");
 
       if (token) {
+        fetchDirectAff();
         setLoggedIn(true);
       } else {
         setLoggedIn(false);
