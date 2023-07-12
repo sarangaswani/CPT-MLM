@@ -118,126 +118,166 @@ const processDailyStakingRewards = async () => {
 setTimeout(processDailyStakingRewards, 24 * 60 * 60 * 1000);
 // --------------------------------UPDATING TOTAL BUSINESS-------------------------------------------------------//
 
-const calculateTotalBusiness = async (referredBy) => {
-  if (!referredBy) {
-    throw new Error("referredBy is required");
-  }
+// const calculateTotalBusiness = async (referredBy) => {
+//   if (!referredBy) {
+//     throw new Error("referredBy is required");
+//   }
 
-  const user = await User.findOne({ referralCode: referredBy });
-  if (!user) {
-    throw new Error("User not found");
-  }
+//   const user = await User.findOne({ referralCode: referredBy });
+//   if (!user) {
+//     throw new Error("User not found");
+//   }
 
-  if (user.directReferrals.length < 3) {
-    throw new Error("Less than 3 direct referrals");
-  }
+//   if (user.directReferrals.length < 3) {
+//     throw new Error("Less than 3 direct referrals");
+//   }
 
-  let referralsBusiness = [];
+//   let referralsBusiness = [];
+//   for (let referralCode of user.directReferrals) {
+//     const referralUser = await User.findOne({ referralCode });
+//     if (referralUser && referralUser.totalBusiness > 0) {
+//       referralsBusiness.push(referralUser.totalBusiness);
+//     }
+//   }
+
+//   if (referralsBusiness.length < 3)
+//     throw new Error("Less than 3 referrals with non-zero totalBusiness");
+
+//   referralsBusiness.sort((a, b) => b - a);
+
+//   const totalBusiness =
+//     referralsBusiness[0] * 0.5 +
+//     referralsBusiness[1] * 0.3 +
+//     referralsBusiness.slice(2).reduce((a, b) => a + b, 0) * 0.2;
+
+//   console.log(totalBusiness);
+
+//   user.totalBusiness = totalBusiness;
+//   if (totalBusiness >= 10000000) {
+//     user.rank = "Royal Crown Diamond";
+//     user.rewards.push({
+//       choice1: 250000,
+//       choice2: "Farm House",
+//     });
+//   } else if (totalBusiness >= 5000000) {
+//     user.rank = "Crown Diamond";
+//     user.rewards.push({
+//       time: new Date(),
+//       choice1: 125000,
+//       choice2: "Villa",
+//     });
+//   } else if (totalBusiness >= 2500000) {
+//     user.rank = "Diamond";
+//     user.rewards.push({
+//       time: new Date(),
+//       choice1: 50000,
+//       choice2: "Flat in Delhi(Metro City)",
+//     });
+//   } else if (totalBusiness >= 1000000) {
+//     user.rewards.push({
+//       time: new Date(),
+//       choice1: 20000,
+//       choice2: "SUV Car",
+//     });
+//     user.rank = "Platinum";
+//   } else if (totalBusiness >= 500000) {
+//     user.rewards.push({
+//       time: new Date(),
+//       choice1: 10000,
+//       choice2: "Sedan Car",
+//     });
+//     user.rank = "Gold";
+//   } else if (totalBusiness >= 250000) {
+//     user.rewards.push({
+//       time: new Date(),
+//       choice1: 5000,
+//       choice2: "Small Car",
+//     });
+//     user.rank = "Silver";
+//   } else if (totalBusiness >= 100000) {
+//     user.rewards.push({
+//       time: new Date(),
+//       choice1: 2500,
+//       choice2: "Bullet Bike",
+//     });
+//     user.rank = "Executive";
+//   } else if (totalBusiness >= 50000) {
+//     user.rewards.push({
+//       time: new Date(),
+//       choice1: 1000,
+//       choice2: "Bike",
+//     });
+//     user.rank = "Senior";
+//   } else if (totalBusiness >= 25000) {
+//     user.rewards.push({
+//       time: new Date(),
+//       choice1: 500,
+//       choice2: "Laptop",
+//     });
+//     user.rank = "Star";
+//   } else if (totalBusiness >= 1000) {
+//     user.rewards.push({
+//       time: new Date(),
+//       choice1: 200,
+//       choice2: "Mobile Phone",
+//     });
+//     user.rank = "Distributer";
+//   }
+
+//   await user.save();
+
+//   // If the user was referred by someone else, recursively calculate their total business
+//   if (user.referredBy) {
+//     const referredByUser = await User.findOne({
+//       referralCode: user.referredBy,
+//     });
+//     if (referredByUser && referredByUser.directReferrals.length > 2) {
+//       await calculateTotalBusiness(user.referredBy);
+//     }
+//   }
+//   return totalBusiness;
+// };
+
+const getDirectReferralsTotalBusiness = async (referralCode) => {
+  const user = await User.findOne({ referralCode: referralCode });
+  if (!user) throw new Error("User not found");
+
+  let referralsTotalBusiness = [];
+
   for (let referralCode of user.directReferrals) {
-    const referralUser = await User.findOne({ referralCode });
-    if (referralUser && referralUser.totalBusiness > 0) {
-      referralsBusiness.push(referralUser.totalBusiness);
-    }
+    const totalBusiness = await calculateReferralTreeBalance(referralCode);
+    referralsTotalBusiness.push(totalBusiness);
   }
 
-  if (referralsBusiness.length < 3)
-    throw new Error("Less than 3 referrals with non-zero totalBusiness");
+  // Sort in descending order
+  referralsTotalBusiness.sort((a, b) => b - a);
 
-  referralsBusiness.sort((a, b) => b - a);
+  // Calculate the percentages
+  const highest = referralsTotalBusiness[0] * 0.5;
+  const secondHighest =
+    referralsTotalBusiness.length > 1 ? referralsTotalBusiness[1] * 0.3 : 0;
+  const rest = referralsTotalBusiness.slice(2).reduce((a, b) => a + b, 0) * 0.2;
 
-  const totalBusiness =
-    referralsBusiness[0] * 0.5 +
-    referralsBusiness[1] * 0.3 +
-    referralsBusiness.slice(2).reduce((a, b) => a + b, 0) * 0.2;
-
-  console.log(totalBusiness);
-
-  user.totalBusiness = totalBusiness;
-  if (totalBusiness >= 10000000) {
-    user.rank = "Royal Crown Diamond";
-    user.rewards.push({
-      choice1: 250000,
-      choice2: "Farm House",
-    });
-  } else if (totalBusiness >= 5000000) {
-    user.rank = "Crown Diamond";
-    user.rewards.push({
-      time: new Date(),
-      choice1: 125000,
-      choice2: "Villa",
-    });
-  } else if (totalBusiness >= 2500000) {
-    user.rank = "Diamond";
-    user.rewards.push({
-      time: new Date(),
-      choice1: 50000,
-      choice2: "Flat in Delhi(Metro City)",
-    });
-  } else if (totalBusiness >= 1000000) {
-    user.rewards.push({
-      time: new Date(),
-      choice1: 20000,
-      choice2: "SUV Car",
-    });
-    user.rank = "Platinum";
-  } else if (totalBusiness >= 500000) {
-    user.rewards.push({
-      time: new Date(),
-      choice1: 10000,
-      choice2: "Sedan Car",
-    });
-    user.rank = "Gold";
-  } else if (totalBusiness >= 250000) {
-    user.rewards.push({
-      time: new Date(),
-      choice1: 5000,
-      choice2: "Small Car",
-    });
-    user.rank = "Silver";
-  } else if (totalBusiness >= 100000) {
-    user.rewards.push({
-      time: new Date(),
-      choice1: 2500,
-      choice2: "Bullet Bike",
-    });
-    user.rank = "Executive";
-  } else if (totalBusiness >= 50000) {
-    user.rewards.push({
-      time: new Date(),
-      choice1: 1000,
-      choice2: "Bike",
-    });
-    user.rank = "Senior";
-  } else if (totalBusiness >= 25000) {
-    user.rewards.push({
-      time: new Date(),
-      choice1: 500,
-      choice2: "Laptop",
-    });
-    user.rank = "Star";
-  } else if (totalBusiness >= 1000) {
-    user.rewards.push({
-      time: new Date(),
-      choice1: 200,
-      choice2: "Mobile Phone",
-    });
-    user.rank = "Distributer";
-  }
-
-  await user.save();
-
-  // If the user was referred by someone else, recursively calculate their total business
-  if (user.referredBy) {
-    const referredByUser = await User.findOne({
-      referralCode: user.referredBy,
-    });
-    if (referredByUser && referredByUser.directReferrals.length > 2) {
-      await calculateTotalBusiness(user.referredBy);
-    }
-  }
-  return totalBusiness;
+  // Return the total
+  return highest + secondHighest + rest;
 };
+
+const calculateReferralTreeBalance = async (referralCode) => {
+  const user = await User.findOne({ referralCode: referralCode });
+  if (!user) return 0;
+
+  let totalBalance = user.balance;
+
+  for (let referralCode of user.directReferrals) {
+    const referralBalance = await calculateReferralTreeBalance(referralCode);
+    totalBalance += referralBalance;
+  }
+
+  return totalBalance;
+};
+
 // --------------------------------WHEN USER WILL INVEST THIS API WILL BE CALLED-------------------------------------------- //
+
 const handleInvestment = async (userId, investmentAmount, userPackage) => {
   const user = await User.findOne({ email: userId });
 
@@ -290,7 +330,7 @@ const handleInvestment = async (userId, investmentAmount, userPackage) => {
     currentReferralCode = referrer.referredBy;
     level += 1;
 
-    await calculateTotalBusiness(user.referredBy); // update total business of above
+    // await calculateTotalBusiness(user.referredBy); // update total business of above
   }
 };
 
@@ -347,7 +387,8 @@ app.post("/signup", async (req, res) => {
 });
 
 app.post("/login", async (req, res) => {
-  await calculateTotalBusiness(0);
+  console.log(total);
+
   const { email, password } = req.body;
   console.log(email, password);
   try {
@@ -365,6 +406,7 @@ app.post("/login", async (req, res) => {
     console.log("login passed", token);
 
     // Creating a sanitized user object to send in the response
+    const total = await getDirectReferralsTotalBusiness(user.referralCode);
     const sanitizedUser = {
       fullName: user.fullName,
       email: user.email,
@@ -376,6 +418,8 @@ app.post("/login", async (req, res) => {
       balanceinDoll: user.balance,
       totalEarning: user.totalEarning,
       rank: user.rank,
+      balance: 1000,
+      totalBusiness: total,
     };
 
     // const directRef = await getDirectReferrals(user.email);

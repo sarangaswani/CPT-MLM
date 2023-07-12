@@ -54,7 +54,7 @@ export default function Register({ url }) {
           setFieldError("referralCode", data.error);
         }
       } else {
-        navigate("/");
+        // navigate("/");
       }
     } catch (error) {
       console.log("Catch is called ", error);
