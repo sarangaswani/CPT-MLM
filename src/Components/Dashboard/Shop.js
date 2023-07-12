@@ -11,7 +11,7 @@ const ProductCard = ({ product }) => {
     var currentUser = JSON.parse(userData);
     const values = {
       userId: currentUser.email,
-      amount: 100,
+      amount: 1000,
       package: "Premium",
     };
     const response = await fetch(`http://localhost:5000/invest`, {

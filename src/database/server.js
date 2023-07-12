@@ -40,6 +40,7 @@ const UserSchema = new mongoose.Schema({
   balanceinCpt: { type: Number, default: 0 }, // this is the amount that is earned and that can be withdrawn/
   joinningDate: { type: Date, default: Date.now },
   totalEarning: Number,
+  rank: String,
   referralBonusEvents: [
     // this is array of object, it will store all the invited users when they will join using current user refferalCode
     {
@@ -49,6 +50,13 @@ const UserSchema = new mongoose.Schema({
       package: String,
       level: Number,
       Earned: Number,
+    },
+  ],
+  rewards: [
+    {
+      time: { type: Date, default: Date.now },
+      choice1: String,
+      choice2: String,
     },
   ],
   dailyStackingEvents: [
@@ -125,24 +133,97 @@ const calculateTotalBusiness = async (referredBy) => {
   }
 
   let referralsBusiness = [];
-  for (let i = 0; i < user.directReferrals.length; i++) {
-    const referralUser = await User.findOne({
-      referralCode: user.directReferrals[i],
-    });
-    if (referralUser) {
+  for (let referralCode of user.directReferrals) {
+    const referralUser = await User.findOne({ referralCode });
+    if (referralUser && referralUser.totalBusiness > 0) {
       referralsBusiness.push(referralUser.totalBusiness);
     }
   }
 
+  if (referralsBusiness.length < 3)
+    throw new Error("Less than 3 referrals with non-zero totalBusiness");
+
   referralsBusiness.sort((a, b) => b - a);
 
-  const highest = referralsBusiness[0] * 0.5;
-  const secondHighest = referralsBusiness[1] * 0.3;
-  const rest = referralsBusiness.slice(2).reduce((a, b) => a + b, 0) * 0.2;
+  const totalBusiness =
+    referralsBusiness[0] * 0.5 +
+    referralsBusiness[1] * 0.3 +
+    referralsBusiness.slice(2).reduce((a, b) => a + b, 0) * 0.2;
 
-  const totalBusiness = highest + secondHighest + rest;
+  console.log(totalBusiness);
 
   user.totalBusiness = totalBusiness;
+  if (totalBusiness >= 10000000) {
+    user.rank = "Royal Crown Diamond";
+    user.rewards.push({
+      choice1: 250000,
+      choice2: "Farm House",
+    });
+  } else if (totalBusiness >= 5000000) {
+    user.rank = "Crown Diamond";
+    user.rewards.push({
+      time: new Date(),
+      choice1: 125000,
+      choice2: "Villa",
+    });
+  } else if (totalBusiness >= 2500000) {
+    user.rank = "Diamond";
+    user.rewards.push({
+      time: new Date(),
+      choice1: 50000,
+      choice2: "Flat in Delhi(Metro City)",
+    });
+  } else if (totalBusiness >= 1000000) {
+    user.rewards.push({
+      time: new Date(),
+      choice1: 20000,
+      choice2: "SUV Car",
+    });
+    user.rank = "Platinum";
+  } else if (totalBusiness >= 500000) {
+    user.rewards.push({
+      time: new Date(),
+      choice1: 10000,
+      choice2: "Sedan Car",
+    });
+    user.rank = "Gold";
+  } else if (totalBusiness >= 250000) {
+    user.rewards.push({
+      time: new Date(),
+      choice1: 5000,
+      choice2: "Small Car",
+    });
+    user.rank = "Silver";
+  } else if (totalBusiness >= 100000) {
+    user.rewards.push({
+      time: new Date(),
+      choice1: 2500,
+      choice2: "Bullet Bike",
+    });
+    user.rank = "Executive";
+  } else if (totalBusiness >= 50000) {
+    user.rewards.push({
+      time: new Date(),
+      choice1: 1000,
+      choice2: "Bike",
+    });
+    user.rank = "Senior";
+  } else if (totalBusiness >= 25000) {
+    user.rewards.push({
+      time: new Date(),
+      choice1: 500,
+      choice2: "Laptop",
+    });
+    user.rank = "Star";
+  } else if (totalBusiness >= 1000) {
+    user.rewards.push({
+      time: new Date(),
+      choice1: 200,
+      choice2: "Mobile Phone",
+    });
+    user.rank = "Distributer";
+  }
+
   await user.save();
 
   // If the user was referred by someone else, recursively calculate their total business
@@ -252,7 +333,9 @@ app.post("/signup", async (req, res) => {
       joinningDate: new Date(),
       totalBusiness: 0,
       totalEarning: 0,
+      rank: "Null",
     });
+
     await newUser.save();
     referrer.directReferrals.push(identificationNumber);
     await referrer.save();
@@ -264,6 +347,7 @@ app.post("/signup", async (req, res) => {
 });
 
 app.post("/login", async (req, res) => {
+  await calculateTotalBusiness(0);
   const { email, password } = req.body;
   console.log(email, password);
   try {
@@ -291,6 +375,7 @@ app.post("/login", async (req, res) => {
       balanceinCpt: user.balanceinCpt,
       balanceinDoll: user.balance,
       totalEarning: user.totalEarning,
+      rank: user.rank,
     };
 
     // const directRef = await getDirectReferrals(user.email);
