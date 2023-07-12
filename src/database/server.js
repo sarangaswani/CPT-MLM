@@ -33,6 +33,7 @@ const UserSchema = new mongoose.Schema({
   referralCode: String, // referralCode of current user
   referredBy: String, // referralCode of the user who invited current user
   directReferrals: [String], // all level 1 referrals
+  totalBusiness: Number,
   package: String,
   referralEarning: { type: Number, default: 0 }, // this is will be dollers
   balance: { type: Number, default: 0 }, // this is the amount invested and it will be in doller
@@ -107,7 +108,54 @@ const processDailyStakingRewards = async () => {
 
 // Call the function after 24 hours
 setTimeout(processDailyStakingRewards, 24 * 60 * 60 * 1000);
+// --------------------------------UPDATING TOTAL BUSINESS-------------------------------------------------------//
 
+const calculateTotalBusiness = async (referredBy) => {
+  if (!referredBy) {
+    throw new Error("referredBy is required");
+  }
+
+  const user = await User.findOne({ referralCode: referredBy });
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  if (user.directReferrals.length < 3) {
+    throw new Error("Less than 3 direct referrals");
+  }
+
+  let referralsBusiness = [];
+  for (let i = 0; i < user.directReferrals.length; i++) {
+    const referralUser = await User.findOne({
+      referralCode: user.directReferrals[i],
+    });
+    if (referralUser) {
+      referralsBusiness.push(referralUser.totalBusiness);
+    }
+  }
+
+  referralsBusiness.sort((a, b) => b - a);
+
+  const highest = referralsBusiness[0] * 0.5;
+  const secondHighest = referralsBusiness[1] * 0.3;
+  const rest = referralsBusiness.slice(2).reduce((a, b) => a + b, 0) * 0.2;
+
+  const totalBusiness = highest + secondHighest + rest;
+
+  user.totalBusiness = totalBusiness;
+  await user.save();
+
+  // If the user was referred by someone else, recursively calculate their total business
+  if (user.referredBy) {
+    const referredByUser = await User.findOne({
+      referralCode: user.referredBy,
+    });
+    if (referredByUser && referredByUser.directReferrals.length > 2) {
+      await calculateTotalBusiness(user.referredBy);
+    }
+  }
+  return totalBusiness;
+};
 // --------------------------------WHEN USER WILL INVEST THIS API WILL BE CALLED-------------------------------------------- //
 const handleInvestment = async (userId, investmentAmount, userPackage) => {
   const user = await User.findOne({ email: userId });
@@ -160,6 +208,8 @@ const handleInvestment = async (userId, investmentAmount, userPackage) => {
     // Move up to the next referrer in the chain
     currentReferralCode = referrer.referredBy;
     level += 1;
+
+    await calculateTotalBusiness(user.referredBy); // update total business of above
   }
 };
 
@@ -180,7 +230,6 @@ app.post("/signup", async (req, res) => {
   const { fullName, email, password, referralCode } = req.body;
   console.log(req.body);
   try {
-    // findUser(refCode);
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ message: "Email already in use" });
@@ -201,6 +250,8 @@ app.post("/signup", async (req, res) => {
       referredBy: referralCode, // referredBy will be referrer's _id
       package: "Null",
       joinningDate: new Date(),
+      totalBusiness: 0,
+      totalEarning: 0,
     });
     await newUser.save();
     referrer.directReferrals.push(identificationNumber);
