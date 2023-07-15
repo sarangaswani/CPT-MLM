@@ -35,9 +35,9 @@ function Main() {
     },
     {
       name: "My Account",
-      decs: "eBank Funds",
-      label: "Total earning",
-      members: `${data2.totalEarning} CPT`,
+      decs: "My Team Business",
+      label: "Total Business",
+      members: `${data2.totalBusiness} $`,
       imageUrl: <MdAttachMoney size={24} color="black" />,
     },
     // Add more user objects as needed

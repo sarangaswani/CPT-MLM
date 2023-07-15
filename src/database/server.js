@@ -387,8 +387,6 @@ app.post("/signup", async (req, res) => {
 });
 
 app.post("/login", async (req, res) => {
-  console.log(total);
-
   const { email, password } = req.body;
   console.log(email, password);
   try {
@@ -418,8 +416,9 @@ app.post("/login", async (req, res) => {
       balanceinDoll: user.balance,
       totalEarning: user.totalEarning,
       rank: user.rank,
-      balance: 1000,
+      balance: user.balance,
       totalBusiness: total,
+      Events: user.referralBonusEvents,
     };
 
     // const directRef = await getDirectReferrals(user.email);

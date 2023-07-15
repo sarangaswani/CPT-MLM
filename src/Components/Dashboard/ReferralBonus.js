@@ -1,7 +1,12 @@
 import React from "react";
-import {  FaRocket,FaBell  } from "react-icons/fa";
+import { FaRocket, FaBell } from "react-icons/fa";
+import Cookies from "js-cookie";
+import { useEffect } from "react";
 
 export default function ReferralBonus() {
+  const userData = Cookies.get("user");
+  var data2 = JSON.parse(userData);
+
   const products = [
     {
       date: "",
@@ -22,9 +27,13 @@ export default function ReferralBonus() {
       status: "",
     },
 
-
     // Add more user objects as needed
   ];
+
+  useEffect(() => {
+    console.log(data2);
+  }, []);
+
   return (
     <>
       <div className="bg-white  items-center rounded-xl p-4">
@@ -32,7 +41,7 @@ export default function ReferralBonus() {
           <h1 className="font-bold flex items-center p-3 sm:mb-0 mb-4">
             <FaRocket
               className="w-6 h-6 "
-              style={{ marginRight: '8px', color: 'gold' }}
+              style={{ marginRight: "8px", color: "gold" }}
             />
             Referral Bonus
           </h1>
@@ -47,7 +56,7 @@ export default function ReferralBonus() {
               type="button"
               class="focus:outline-none text-white bg-yellow-400 hover:bg-yellow-500 font-medium rounded-lg text-sm px-5 py-2.5  flex items-center "
             >
-            <FaBell className="w-4 h-4" style={{ marginRight: '3px'}} />
+              <FaBell className="w-4 h-4" style={{ marginRight: "3px" }} />
               Request Withdrawal
             </button>
           </div>
@@ -59,25 +68,27 @@ export default function ReferralBonus() {
           <thead className="text-xs text-black uppercase bg-white dark:bg-white dark:text-black">
             <tr>
               <th scope="col" className="px-6 py-3">
-              S.no
+                S.no
               </th>
               <th scope="col" className="px-6 py-3">
-              Date
+                Date
               </th>
               <th scope="col" className="px-6 py-3">
-              Description
+                Email
               </th>
               <th scope="col" className="px-6 py-3">
-              Value
+                Earned
               </th>
               <th scope="col" className="px-6 py-3">
-              Status
+                Package
               </th>
-             
+              <th scope="col" className="px-6 py-3">
+                Level
+              </th>
             </tr>
           </thead>
           <tbody>
-            {products.map((product, index) => (
+            {data2.Events.map((product, index) => (
               <tr
                 key={index}
                 className="bg-white border-b dark:bg-white border-gray-300"
@@ -86,12 +97,15 @@ export default function ReferralBonus() {
                   scope="row"
                   className="px-6 py-4 font-medium text-black whitespace-nowrap dark:text-black"
                 >
-                  {index+1}
+                  {index + 1}
                 </th>
-                <td className="px-6 py-4">{product.date}</td>
-                <td className="px-6 py-4">{product.description}</td>
-                <td className="px-6 py-4">{product.value}</td>
-                <td className="px-6 py-4">{product.status}</td>
+                <td className="px-6 py-4">
+                  {new Date(product.time).toLocaleDateString("en-GB")}
+                </td>
+                <td className="px-6 py-4">{product.referralCode}</td>
+                <td className="px-6 py-4">{product.Earned} $</td>
+                <td className="px-6 py-4">{product.package}</td>
+                <td className="px-6 py-4">{product.level}</td>
               </tr>
             ))}
           </tbody>
