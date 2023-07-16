@@ -6,7 +6,9 @@ import Cookies from "js-cookie";
 const ProductCard = ({ product }) => {
   const decsLines = product.decs.split("\n");
 
-  const handleBuyNow = async () => {
+  const handleBuyNow = async (product) => {
+    console.log(product);
+    // ----------------------------- ADD PAYMENT METHOD FIRST ----------------------------- //
     const userData = Cookies.get("user");
     var currentUser = JSON.parse(userData);
     const values = {
@@ -44,7 +46,9 @@ const ProductCard = ({ product }) => {
         <div className="flex items-center justify-between">
           <span className="text-3xl font-bold text-black">{product.price}</span>
           <button
-            onClick={handleBuyNow}
+            onClick={(e) => {
+              handleBuyNow(product);
+            }}
             className={`text-white ${product.color} hover:bg-${product.color}-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center`}
           >
             Buy Now
@@ -63,15 +67,10 @@ const ProductList = () => {
       ),
       title: "Standard Package",
       rating: 5,
-      decs: `1000 Seo Points
-600 ePoints
-Marketing Hosting Account
-Full Access to Online Training
-Virtual Office Access
-Affiliate Programme benefits
-2 Year access to Member`,
-      price: "$270",
+      decs: `225% of TCP`,
+      price: "$50",
       color: "bg-green-500",
+      dollar: 50,
     },
     {
       image: (
@@ -79,15 +78,10 @@ Affiliate Programme benefits
       ),
       title: "Platinum Package",
       rating: 5,
-      decs: `2000 Seo Points
-      1000 ePoints
-      Marketing Hosting Account
-      Full Access to Online Training 
-      Virtual Office Access
-      Affiliate Programme benefits
-      2 Year access to Member`,
-      price: "$450",
+      decs: `235% of TCP`,
+      price: "$100",
       color: "bg-red-500",
+      dollar: 100,
     },
     {
       image: (
@@ -95,15 +89,54 @@ Affiliate Programme benefits
       ),
       title: "Exclusive Package",
       rating: 5,
-      decs: `5000 Seo Points
-      2500 ePoints
-      Marketing Hosting Account
-      Full Access to Online Training 
-      Virtual Office Access
-      Affiliate Programme benefits
-      2 Year access to Member`,
-      price: "$900",
+      decs: `245% of TCP`,
+      price: "$250",
       color: "bg-yellow-500",
+      dollar: 250,
+    },
+    {
+      image: (
+        <FontAwesomeIcon icon={faStar} className="w-10 h-10 text-orange-500" />
+      ),
+      title: "Exclusive Package",
+      rating: 5,
+      decs: `265% of TCP`,
+      price: "$500",
+      color: "bg-orange-500",
+      dollar: 500,
+    },
+    {
+      image: (
+        <FontAwesomeIcon icon={faStar} className="w-10 h-10 text-blue-400" />
+      ),
+      title: "Exclusive Package",
+      rating: 5,
+      decs: `270% of TCP`,
+      price: "$1.000",
+      color: "bg-blue-500",
+      dollar: 1000,
+    },
+    {
+      image: (
+        <FontAwesomeIcon icon={faStar} className="w-10 h-10 text-purple-400" />
+      ),
+      title: "Exclusive Package",
+      rating: 5,
+      decs: `275% of TCP`,
+      price: "$5,000",
+      color: "bg-purple-500",
+      dollar: 5000,
+    },
+    {
+      image: (
+        <FontAwesomeIcon icon={faStar} className="w-10 h-10 text-black-400" />
+      ),
+      title: "Exclusive Package",
+      rating: 5,
+      decs: `285% of TCP`,
+      price: "$10,000",
+      color: "bg-yellow-500",
+      dollar: 10000,
     },
   ];
 

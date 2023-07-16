@@ -30,7 +30,7 @@ function Main() {
       name: "Affiliate Network",
       decs: "My Team Network",
       label: "Team Count",
-      members: `${allRef}? Members`,
+      members: `${allRef} Members`,
       imageUrl: <FontAwesomeIcon icon={faPaperPlane} size="xl" />,
     },
     {

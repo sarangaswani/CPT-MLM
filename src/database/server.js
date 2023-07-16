@@ -41,6 +41,7 @@ const UserSchema = new mongoose.Schema({
   joinningDate: { type: Date, default: Date.now },
   totalEarning: Number,
   rank: String,
+  walletAdress: String,
   referralBonusEvents: [
     // this is array of object, it will store all the invited users when they will join using current user refferalCode
     {
@@ -325,7 +326,6 @@ const handleInvestment = async (userId, investmentAmount, userPackage) => {
       referrer.balanceinCpt += reward * 20; //  directly it will be in the user account
       await referrer.save();
     }
-
     // Move up to the next referrer in the chain
     currentReferralCode = referrer.referredBy;
     level += 1;
