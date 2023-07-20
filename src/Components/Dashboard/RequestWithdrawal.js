@@ -5,9 +5,11 @@ import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { faExclamationTriangle } from "@fortawesome/free-solid-svg-icons";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-
+import Cookies from "js-cookie";
 const RequestWithdrawal = () => {
   // Define Yup validation schema
+  const userData = Cookies.get("user");
+  var data2 = JSON.parse(userData);
   const validationSchema = Yup.object().shape({
     eBankBalance: Yup.number()
       .required("eBank Balance is required")
@@ -17,19 +19,18 @@ const RequestWithdrawal = () => {
       .required("Withdrawal Amount is required")
       .positive("Withdrawal Amount must be a positive number"),
   });
-
   // Define initial form values
   const initialValues = {
-    eBankBalance: "",
+    eBankBalance: data2.balanceinCpt,
     address: "",
     withdrawalAmount: "",
   };
 
   // Handle form submission
-  const handleSubmit = (values, { resetForm }) => {
+  const handleSubmit = (values) => {
     // Perform form submission logic here
     console.log(values);
-    resetForm();
+    // resetForm();
   };
 
   return (
@@ -43,6 +44,7 @@ const RequestWithdrawal = () => {
             />
             Earning Withdrawal
           </h1>
+
           <button
             type="button"
             className="focus:outline-none text-white bg-pink-500 hover:bg-pink-600  font-medium rounded-lg text-sm px-5 py-2.5  dark:bg-pink-500 dark:hover:bg-pink-600 flex items-center"
@@ -55,9 +57,9 @@ const RequestWithdrawal = () => {
       <div className="bg-white rounded-xl flex items-center">
         <div className=" m-6 w-full mx-12 ">
           <Formik
-            initialValues={initialValues}
             validationSchema={validationSchema}
-            onSubmit={handleSubmit}
+            initialValues={initialValues}
+            onSubmit={(values) => handleSubmit(values)}
           >
             <Form>
               <div className="bg-gray-200 p-4 mb-6 border rounded-md flex items-center">
@@ -80,18 +82,15 @@ const RequestWithdrawal = () => {
                   htmlFor="eBankBalance"
                   className="block font-medium text-gray-700"
                 >
-                  eBank Balance
+                  eBank Balance:
                 </label>
                 <Field
-                  type="number"
+                  type="text"
                   id="eBankBalance"
                   name="eBankBalance"
-                  className="mt-1 p-2 block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                />
-                <ErrorMessage
-                  name="eBankBalance"
-                  component="div"
-                  className="text-red-500 text-sm mt-1"
+                  readOnly
+                  value={data2.balanceinCpt}
+                  className="block font-medium text-gray-700"
                 />
               </div>
 
@@ -100,19 +99,14 @@ const RequestWithdrawal = () => {
                   htmlFor="address"
                   className="block font-medium text-gray-700"
                 >
-                  Select Address
+                  Connected Address
                 </label>
                 <Field
-                  as="select"
+                  type="text"
                   id="address"
                   name="address"
-                  className="mt-1 p-2 block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                >
-                  <option value="">Select Address</option>
-                  <option value="address1">Address 1</option>
-                  <option value="address2">Address 2</option>
-                  <option value="address3">Address 3</option>
-                </Field>
+                  className="mt-1 block p-2 w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                />
                 <ErrorMessage
                   name="address"
                   component="div"
