@@ -17,6 +17,7 @@ import DesktopMenu from "./DesktopMenu";
 import ReferralBonus from "./ReferralBonus";
 import TeamBuildingBonus from "./TeamBuildingBonus";
 import RequestWithdrawal from "./RequestWithdrawal";
+import RankAndReward from "./RankAndReward";
 
 const Dashboard = ({ match }) => {
   const token = Cookies.get("authToken");
@@ -57,6 +58,10 @@ const Dashboard = ({ match }) => {
         {
           name: "Team Building Bonus",
           href: "/Dashboard/My-Earnings/Team-Building-Bonus",
+        },
+        {
+          name: "Rank and Reward",
+          href: "/Dashboard/My-Earnings/Rand-And-Reward",
         },
       ],
     },
@@ -150,6 +155,10 @@ const Dashboard = ({ match }) => {
               <Route
                 path="My-Earnings/Team-Building-Bonus"
                 element={<TeamBuildingBonus />}
+              />
+              <Route
+                path="My-Earnings/Rand-And-Reward"
+                element={<RankAndReward />}
               />
               <Route
                 path="eBank/Request-Withdrawal"

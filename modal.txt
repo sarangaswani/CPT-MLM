@@ -1,0 +1,99 @@
+import React, { useState } from "react";
+import Slider from "react-slick";
+const ModalWithImages = ({ isOpen, onClose }) => {
+    const [selectedFile, setSelectedFile] = useState(null);
+
+    const handleFileChange = (e) => {
+        setSelectedFile(e.target.files[0]);
+      };
+
+      const handleSubmit = () => {
+        // You can handle the form submission here
+        if (selectedFile) {
+          console.log("Selected File:", selectedFile);
+          // Reset the file input
+          setSelectedFile(null);
+        }
+        onClose(); // Close the modal after submitting
+      };
+      const sliderSettings = {
+        dots: true,
+        infinite: false, // Set infinite to false to prevent infinite expansion
+        speed: 500,
+        slidesToShow: 1, // Set the number of images to display at once
+        slidesToScroll: 1,
+      };
+
+  return (
+    <div
+      className={`${
+        isOpen ? "fixed inset-0 flex justify-center items-center" : "hidden"
+      } bg-black bg-opacity-50`}
+    >
+      <div className="bg-white p-8 rounded-lg">
+        <h2 className="text-xl font-semibold mb-4">Modal with Images</h2>
+        <Slider {...sliderSettings}>
+          {/* Add your images to the slider */}
+          <div>
+            <img
+              src="path/to/image1.jpg"
+              alt="Image 1"
+              className="w-full h-auto rounded-lg"
+            />
+          </div>
+          <div>
+            <img
+              src="path/to/image2.jpg"
+              alt="Image 2"
+              className="w-full h-auto rounded-lg"
+            />
+          </div>
+          {/* Add more images as needed */}
+        </Slider>
+        <div className="mb-4">
+        <label htmlFor="fileInput" className="block text-sm font-medium">
+            Select Document:
+          </label>
+          <input
+            type="file"
+            id="fileInput"
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+            onChange={handleFileChange}
+          />
+        </div>
+        <button
+          onClick={handleSubmit}
+          className="block bg-blue-500 text-white font-semibold px-4 py-2 rounded-md"
+        >
+          Submit
+        </button>
+        <button
+          onClick={onClose}
+          className="block mt-4 px-4 py-2 text-sm font-semibold text-white bg-red-500 rounded-md"
+        >
+          Close Modal
+        </button>
+      </div>
+    </div>
+  );
+};
+
+export default ModalWithImages;
+
+
+
+
+
+
+
+const images = [
+    ETHImage,
+    TRX,
+    USDT1,
+    USDT2,
+  ];
+
+import ETHImage from "../../assets/ETH.jpg"
+import TRX from "../../assets/TRX.jpg"
+import USDT1 from "../../assets/USDT.jpg"
+import USDT2 from "../../assets/USDT2.jpg"

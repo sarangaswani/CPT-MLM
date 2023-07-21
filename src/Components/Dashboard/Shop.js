@@ -1,9 +1,16 @@
-import React from "react";
+import React,{useState} from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faStar } from "@fortawesome/free-solid-svg-icons";
 import Cookies from "js-cookie";
+import ShopModal from "./RankAndReward/ShopModal";
+import ReactDOM from "react-dom";
+import ETHImage from "../../assets/ETH.jpg"
+import TRX from "../../assets/TRX.jpg"
+import USDT1 from "../../assets/USDT.jpg"
+import USDT2 from "../../assets/USDT2.jpg"
+import { createPortal } from "react-dom";
 
-const ProductCard = ({ product }) => {
+const ProductCard = ({ product,setisOpen,setcurrProd}) => {
   const decsLines = product.decs.split("\n");
 
   const handleBuyNow = async (product) => {
@@ -25,6 +32,8 @@ const ProductCard = ({ product }) => {
     });
     const data = await response.json();
     console.log(data, response);
+    setisOpen(true);
+    setcurrProd(product)
   };
 
   return (
@@ -47,7 +56,7 @@ const ProductCard = ({ product }) => {
           <span className="text-3xl font-bold text-black">{product.price}</span>
           <button
             onClick={(e) => {
-              handleBuyNow(product);
+              handleBuyNow(product)
             }}
             className={`text-white ${product.color} hover:bg-${product.color}-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center`}
           >
@@ -139,13 +148,59 @@ const ProductList = () => {
       dollar: 10000,
     },
   ];
+  const images = [
+    {
+      image: USDT1,
+      name: "USDT",
+      address: "0x1F3A22F6E79504995F00C9c874cf6C9070599526"
 
+    },
+    {
+      image: ETHImage,
+      name: "ETH",
+      address: "0x76a19B22A3154F6f1FE2066CbC1Bdfc16888DB08"
+    },
+    {
+      image: TRX,
+      name: "TRX",
+      address: "TU2Ezd2NJkWCSyGLHGkYq9HWEpSht3bNsU"
+    },
+    
+    {
+      image: USDT2,
+      name: "USDT",
+      address: "TU2Ezd2NJkWCSyGLHGkYq9HWEpSht3bNsU"
+    } 
+    
+  ];
+  
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currProd, setcurrProd] = useState(null);
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
+  const portalRoot = document.getElementById("portal-root");
+  const portalContainer = document.createElement("div");
+
+  React.useEffect(() => {
+    portalRoot.appendChild(portalContainer);
+
+    // Cleanup function to remove the portal container when the component is unmounted
+    return () => {
+      portalRoot.removeChild(portalContainer);
+    };
+  }, [portalRoot, portalContainer]);
   return (
+    <>
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-9 py-4 place-items-center">
       {products.map((product, index) => (
-        <ProductCard key={index} product={product} />
+        <ProductCard key={index} product={product} setisOpen={setIsModalOpen} setcurrProd={setcurrProd}/>
       ))}
     </div>
+    {/* <ShopModal/> */}
+    {isModalOpen &&
+      createPortal(<ShopModal images={images} onClose={handleCloseModal} product={currProd}/>, portalContainer)}
+    </>
   );
 };
 
