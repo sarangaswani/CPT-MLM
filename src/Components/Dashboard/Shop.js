@@ -150,23 +150,27 @@ const ProductList = () => {
   ];
   const images = [
     {
+      index: 1,
       image: USDT1,
       name: "USDT",
       address: "0x1F3A22F6E79504995F00C9c874cf6C9070599526"
 
     },
     {
+      index: 2,
       image: ETHImage,
       name: "ETH",
       address: "0x76a19B22A3154F6f1FE2066CbC1Bdfc16888DB08"
     },
     {
+      index: 3,
       image: TRX,
       name: "TRX",
       address: "TU2Ezd2NJkWCSyGLHGkYq9HWEpSht3bNsU"
     },
     
     {
+      index: 4,
       image: USDT2,
       name: "USDT",
       address: "TU2Ezd2NJkWCSyGLHGkYq9HWEpSht3bNsU"

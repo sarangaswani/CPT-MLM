@@ -241,7 +241,7 @@ export default function Register({ url }) {
                 <p className="text-sm font-light text-gray-500 dark:text-white">
                   Already have an account?{" "}
                   <Link
-                    to="/SignIn"
+                    to="/GetStarted"
                     className="font-medium text-primary-600 hover:underline dark:text-gray-500"
                   >
                     Login here

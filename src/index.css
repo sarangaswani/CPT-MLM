@@ -3,7 +3,7 @@
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
 
-.slick-slider {
+/* .slick-slider {
   .slick-prev,
   .slick-next {
     background-color: rgba(0, 0, 0, 0.5);
@@ -32,6 +32,6 @@
   .slick-next {
     right: 10px;
   }
-}
+} */
 
 

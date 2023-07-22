@@ -18,6 +18,8 @@ import ReferralBonus from "./ReferralBonus";
 import TeamBuildingBonus from "./TeamBuildingBonus";
 import RequestWithdrawal from "./RequestWithdrawal";
 import RankAndReward from "./RankAndReward";
+import AllRequests from "./AllRequests";
+import NewRequests from "./NewRequests";
 
 const Dashboard = ({ match }) => {
   const token = Cookies.get("authToken");
@@ -45,8 +47,7 @@ const Dashboard = ({ match }) => {
         },
       ],
     },
-    { name: "mCash", href: "#" },
-    { name: "MUSD", href: "#" },
+   
     {
       name: "My Earnings",
       href: "#",
@@ -79,8 +80,19 @@ const Dashboard = ({ match }) => {
         },
       ],
     },
-    { name: "Notifications", href: "#" },
-    { name: "Support", href: "#" },
+    
+    { name: "Requests", href: "#",
+    subitems: [
+      {
+        name: "New Requests",
+        href: "/Dashboard/Requests/New-Requests",
+      },
+      {
+        name: "All Requests",
+        href: "/Dashboard/Requests/All-Requests",
+      },
+    ], },
+   
   ];
 
   function classNames(...classes) {
@@ -163,6 +175,14 @@ const Dashboard = ({ match }) => {
               <Route
                 path="eBank/Request-Withdrawal"
                 element={<RequestWithdrawal />}
+              />
+              <Route
+                path="Requests/All-Requests"
+                element={<AllRequests />}
+              />
+              <Route
+                path="Requests/New-Requests"
+                element={<NewRequests />}
               />
               {/* Add more Route components for each navigation item */}
             </Routes>

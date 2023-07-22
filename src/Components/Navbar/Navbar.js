@@ -18,10 +18,10 @@ const Navbar = () => {
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
             <div className="flex-shrink-0">
-              <h1 className="text-white text-2xl font-bold">ProsperChain</h1>
+              <h1 className="text-white text-2xl font-bold">ToPayCoin</h1>
             </div>
           </div>
-          <div className="hidden md:block">
+          {/* <div className="hidden md:block">
             <div className="ml-4 flex items-center md:ml-6">
               <Link
                 to="/"
@@ -51,7 +51,7 @@ const Navbar = () => {
                 Login
               </Link>
             </div>
-          </div>
+          </div> */}
           <div className="-mr-2 flex md:hidden">
             <button
               onClick={toggleMenu}
@@ -92,7 +92,7 @@ const Navbar = () => {
           </div>
         </div>
       </div>
-      <div className={`${isMenuOpen ? "block" : "hidden"} md:hidden`}>
+      {/* <div className={`${isMenuOpen ? "block" : "hidden"} md:hidden`}>
         <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
           <Link
             to="/"
@@ -120,7 +120,7 @@ const Navbar = () => {
             Login
           </Link>
         </div>
-      </div>
+      </div> */}
     </nav>
   );
 };

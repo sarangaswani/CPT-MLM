@@ -29,10 +29,10 @@ const CompanyOverview = () => {
     <div className="relative bg-gradient-to-br from-MiddlePurple via-customPurple to-MiddlePurple pt-10 pb-6 px-4 sm:px-6 lg:px-8">
       <div className="bg-transparent rounded-lg p-8 sm:p-10 text-white">
         <h1 className="text-3xl sm:text-4xl mt-16 font-bold mb-6 slide-in">
-          Prosperchain - Driving Innovation in Web3 Technology
+          ToPayCoin - Driving Innovation in Web3 Technology
         </h1>
         <p className="mt-10 max-w-8xl text-lg mb-8 slide-in">
-          Prosperchain is an innovative web3 project company at the forefront of
+          ToPayCoin is an innovative web3 project company at the forefront of
           the decentralized technology revolution. We are passionate about
           leveraging blockchain, smart contracts, and decentralized applications
           (dApps) to drive positive change across various industries. Our team

@@ -4,76 +4,86 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
 const PortalSlider = ({ images, onClose, product }) => {
-  // Slick Slider settings
   const sliderSettings = {
-    dots: false,
+    dots: true,
     infinite: false,
     speed: 500,
     slidesToShow: 1,
     slidesToScroll: 1,
+    arrows: true,
+    autoplaySpeed: 5000,
   };
+
   const [selectedFile, setSelectedFile] = useState(null);
+  const [copied, setCopied] = useState(false);
 
   const handleFileChange = (e) => {
     setSelectedFile(e.target.files[0]);
   };
 
   const handleSubmit = () => {
-    // You can handle the form submission here
     if (selectedFile) {
       console.log("Selected File:", selectedFile);
-      // Reset the file input
       setSelectedFile(null);
     }
-    onClose(); // Close the modal after submitting
+    onClose();
+  };
+
+  const handleCopyAddress = (address) => {
+    navigator.clipboard.writeText(address).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    });
   };
 
   return (
-    <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-75 flex items-center justify-center ">
-      <div className=" bg-white w-1/2 rounded-lg p-4 pt-4">
+    <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-75 flex items-center justify-center">
+      <div className="bg-white w-11/12 md:w-1/2 lg:w-1/3 rounded-lg p-4 pt-4">
         <div className={`${product.color} text-white p-2 rounded-md mb-5`}>
-        <p className="font-semibold text-center">Payment</p>
+          <p className="font-semibold text-center">Payment</p>
         </div>
 
-        <div className="w-full bg-white rounded-lg overflow-hidden mx-auto">
+        <div className="w-full h-72 sm:h-96 bg-white rounded-lg overflow-hidden mx-auto">
           <Slider {...sliderSettings}>
             {images.map((item, index) => (
               <div key={index}>
-                <img
-                  src={item.image}
-                  alt={item.name}
-                  className="w-56 mx-auto"
-                />
-                <div className="flex flex-col my-10">
-                  <p className="text-xl font-bold">Currency: {item.name}</p>
-                  <p className="text-xl font-semibold">
+                <img src={item.image} alt={item.name} className="w-56 mx-auto" />
+                <div className="flex flex-col h-20 sm:h-24 my-4 whitespace-normal">
+                  <p className="text-lg font-bold">Currency: {item.name}</p>
+                  <p
+                    className="text-base md:text-lg font-semibold leading-normal md:leading-tight cursor-pointer text-blue-700 overflow-hidden"
+                    onClick={() => handleCopyAddress(item.address)}
+                  >
                     Public Address: {item.address}
                   </p>
+                  {copied && (
+                    <p className="text-sm text-green-600">Address copied to clipboard!</p>
+                  )}
                 </div>
               </div>
             ))}
           </Slider>
         </div>
-        <div className="mb-7 ">
-          <h1 className="text-xl mb-2 font-bold">Package Details:</h1>
-          <p className="font-semibold">{product.title} </p>
-          <p className="font-semibold">{product.price} </p>
+        <div className="mb-4">
+          <h1 className="text-lg mb-2 font-bold">Package Details:</h1>
+          <p className="font-semibold">{product.title}</p>
+          <p className="font-semibold">{product.price}</p>
         </div>
-        <div className="mb-9 ">
+        <div className="mb-6">
           <label htmlFor="fileInput" className="block text-lg font-medium">
             Select Document:
           </label>
           <input
             type="file"
             id="fileInput"
-            className="mt-1 block w-1/2 rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
             onChange={handleFileChange}
           />
         </div>
-        <div className="flex justify-between">
+        <div className="flex flex-col sm:flex-row justify-center sm:justify-between">
           <button
             onClick={handleSubmit}
-            className={`block ${product.color} text-white font-semibold px-4 py-2 rounded-md`}
+            className={`block ${product.color} text-white font-semibold px-4 py-2 rounded-md mb-2 sm:mb-0`}
           >
             Submit
           </button>
