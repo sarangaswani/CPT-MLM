@@ -6,18 +6,34 @@ import Cookies from "js-cookie";
 function RankAndReward() {
   const userData = Cookies.get("user");
   var currentUser = JSON.parse(userData);
-  console.log(currentUser);
+  // console.log(currentUser);
   const [selectedOption, setSelectedOption] = useState(null);
   const [ethAddress, setEthAddress] = useState("");
   const [homeAddress, setHomeAddress] = useState("");
   const [mobileNumber, setMobileNumber] = useState("");
-  console.log(currentUser.rewards.choice1);
+  const [ethAddressError, setEthAddressError] = useState("");
+  // console.log(currentUser.rewards.choice1);
+
+  const isValidEthereumAddress = (address) => {
+    // Ethereum addresses are hexadecimal strings with a length of 42 (including "0x" prefix).
+    const ethereumAddressRegex = /^0x[0-9a-fA-F]{40}$/;
+    return ethereumAddressRegex.test(address);
+  };
 
   const handleRewardSelection = (option) => {
     setSelectedOption(option);
   };
 
   const handleClaimReward = async () => {
+    if (selectedOption === "choice1") {
+      if (!isValidEthereumAddress(ethAddress)) {
+        setEthAddressError("Invalid Ethereum address");
+        return;
+      } else {
+        setEthAddressError("");
+      }
+    }
+
     const values = {
       WalletAddress: ethAddress,
       HomeAddress: homeAddress,
@@ -27,6 +43,8 @@ function RankAndReward() {
       choice: selectedOption,
       rank: currentUser.rank,
     };
+
+    console.log(values);
     const response = await fetch("http://localhost:5000/claimRankandReward", {
       method: "POST",
       headers: {
@@ -95,7 +113,8 @@ function RankAndReward() {
                     $ {currentUser.rewards.choice1}
                   </h3>
                   <p className="text-gray-600">
-                    Get $100 worth TCP tokens that will be claimable in one week
+                    Get ${currentUser.rewards.choice1} worth TCP tokens that
+                    will be claimable in one week
                   </p>
                 </div>
                 <input
@@ -116,6 +135,9 @@ function RankAndReward() {
                     value={ethAddress}
                     onChange={(e) => setEthAddress(e.target.value)}
                   />
+                  {ethAddressError && (
+                    <p className="text-red-600">{ethAddressError}</p>
+                  )}
                 </div>
               )}
             </label>
@@ -127,7 +149,8 @@ function RankAndReward() {
                     {currentUser.rewards.choice2}
                   </h3>
                   <p className="text-gray-600 ">
-                    Get $200 worth mobile phone, that will be delivere in 2
+                    Get ${currentUser.rewards.choice1} worth{" "}
+                    {currentUser.rewards.choice2}, that will be delivere in 2
                     weeks
                   </p>
                 </div>
@@ -171,7 +194,7 @@ function RankAndReward() {
           </button>
         </div>
       ) : (
-        <> </>
+        <>..</>
       )}
     </>
   );

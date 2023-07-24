@@ -41,6 +41,7 @@ function App() {
   };
 
   useEffect(() => {
+    console.log("checking");
     const checkLoginStatus = () => {
       const token = Cookies.get("authToken");
 

@@ -5,10 +5,10 @@ const argon2 = require("argon2");
 const jwt = require("jsonwebtoken");
 const cors = require("cors");
 const secret = "./config";
-const multer = require("multer");
+// const multer = require("multer");
 const dotenv = require("dotenv");
 
-const upload = multer();
+// const upload = multer();
 const app = express();
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
@@ -695,18 +695,41 @@ app.post("/all-referrals", async (req, res) => {
 });
 
 app.post("/claimRankandReward", async (req, res) => {
-  const { email, choice, HomeAddress, WalletAddress, PhoneNumber } = req.body;
+  const {
+    email,
+    choice,
+    HomeAddress,
+    WalletAddress,
+    PhoneNumber,
+    referralCode,
+  } = req.body;
+  console.log(req.body);
   const user = await User.findOne({ email });
   if (!user) {
-    return res.status(404).json({ message: "User not found" });
+    return res.status(400).json({ error: "Email not found" });
   }
   if (choice === "choice1") {
     // call cron jobs here off releasing CPT after week
+    user.rewardsClaimed.push({
+      time: new Date(),
+      choice1: user.rewards.choice1,
+      choice2: user.rewards.choice2,
+      choosen: user.rewards.choice1,
+      rank: user.rank,
+    });
+    user.rewards = {
+      choice1: "Null",
+      choice2: "Null",
+    };
+    await user.save();
+    return res.status(200).json({ message: "Request Submitted" });
+    // await newRankAndReward.save();
   } else if (choice === "choice2") {
+    console.log("first");
     const newRankAndReward = new RankAndReward({
       email,
       referralCode: user.referralCode,
-      choice,
+      choice: user.rewards.choice2,
       rank: user.rank,
       HomeAddress,
       PhoneNumber,
@@ -716,7 +739,7 @@ app.post("/claimRankandReward", async (req, res) => {
       time: new Date(),
       choice1: user.rewards.choice1,
       choice2: user.rewards.choice2,
-      choosen: choice,
+      choosen: user.rewards.choice2,
       rank: user.rank,
     });
     user.rewards = {
@@ -725,7 +748,9 @@ app.post("/claimRankandReward", async (req, res) => {
     };
     await user.save();
     await newRankAndReward.save();
+    return res.status(200).json({ message: "Request Submitted" });
   }
+  return res.status(500).json({ message: "Internal server error" });
 });
 
 app.post("/send-cpt", async (req, res) => {
