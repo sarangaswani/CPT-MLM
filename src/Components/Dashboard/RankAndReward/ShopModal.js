@@ -27,6 +27,7 @@ const PortalSlider = ({ images, onClose, product }) => {
   const handleSubmit = async () => {
     if (selectedFile) {
       // console.log(currentUser, selectedFile);
+
       const requestData = {
         email: currentUser.email,
         referralCode: currentUser.referralCode,
@@ -35,32 +36,23 @@ const PortalSlider = ({ images, onClose, product }) => {
       };
       console.log(JSON.stringify(requestData));
       const formData = new FormData();
+      formData.append("image", selectedFile, selectedFile.name);
       formData.append("email", currentUser.email);
       formData.append("referralCode", currentUser.referralCode);
       formData.append("package", currentUser.package);
-      formData.append("Image", selectedFile);
+      console.log(formData);
       try {
-        // for (var key of formData.entries()) {
-        //   console.log(key[0] + ", " + key[1]);
-        // }
-        // console.log(JSON.stringify(requestData));
-        const response = await fetch("http://localhost:5000/addRequest", {
+        fetch("http://localhost:5000/addRequest", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(requestData),
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          console.log(data.message); // Log the response message from the server
-          setSelectedFile(null);
-          window.alert("Request added successfully!");
-        } else {
-          console.error("Request failed:", response.status);
-          // Handle the error appropriately (e.g., show an error message to the user)
-        }
+          body: formData,
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            console.log("Image uploaded successfully!", data);
+          })
+          .catch((error) => {
+            console.error("Error uploading image:", error);
+          });
       } catch (error) {
         console.error("Error:", error);
         // Handle the error appropriately (e.g., show an error message to the user)

@@ -82,11 +82,17 @@ function RankAndReward() {
             >
               Total Business: $ {currentUser.totalBusiness}
             </button>
+            <button
+              type="button"
+              class="focus:outline-none text-white bg-yellow-500   font-medium rounded-lg text-sm px-5 py-2.5  dark:bg-yellow-500  flex items"
+            >
+              Rank: {currentUser.rank}
+            </button>
           </div>
         </div>
       </div>
 
-      {currentUser.rewards.choice1 !== "Null" || currentUser.rank !== "Null" ? (
+      {currentUser.rewards.choice1 !== "Null" ? (
         <div className="bg-white flex flex-col p-10 rounded-xl mt-4 overflow-x-auto">
           <h1 className="flex text-3xl font-semibold mb-8 justify-center">
             <div className="text-yellow-500 text-3xl flex justify-center items-center mr-3">
@@ -194,7 +200,23 @@ function RankAndReward() {
           </button>
         </div>
       ) : (
-        <>..</>
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-1 gap-4 mb-8 ">
+            {currentUser.rank === "Null" ? (
+              <RankCard
+                rank="1"
+                title="You have not achived any rank to get rewards "
+              />
+            ) : (
+              <>
+                <RankCard
+                  rank="1"
+                  title="You have already claimed your reward"
+                />
+              </>
+            )}
+          </div>
+        </>
       )}
     </>
   );

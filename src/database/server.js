@@ -5,14 +5,25 @@ const argon2 = require("argon2");
 const jwt = require("jsonwebtoken");
 const cors = require("cors");
 const secret = "./config";
-// const multer = require("multer");
+const multer = require("multer");
+const path = require("path");
 const dotenv = require("dotenv");
-
+const { Storage } = require("@google-cloud/storage");
 // const upload = multer();
 const app = express();
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+const storage = multer.diskStorage({
+  destination: "./uploads",
+  filename: function (req, file, cb) {
+    cb(
+      null,
+      file.fieldname + "-" + Date.now() + path.extname(file.originalname)
+    );
+  },
+});
+const upload = multer({ storage: storage });
 
 // connectDb();
 mongoose
@@ -102,22 +113,51 @@ const RankAndRewardsSchema = new mongoose.Schema({
 
 const RankAndReward = mongoose.model("RankAndReward", RankAndRewardsSchema);
 
-app.post("/addRequest", async (req, res) => {
-  console.log("incoming datas", req.body);
-  const { email, referralCode, package, Image } = req.body;
-  console.log(email, referralCode, package, Image);
+// const keyAcess = new Storage({
+//   keyFilename: "src/database/your-key-file.json",
+//   projectId: "pro-hologram-393707",
+// });
+const GoogleStorage = new Storage({
+  keyFilename: "key.json",
+});
+//dOuTDE8WrJb8pO+i5KkTJ3wQTBo/OEV9rgb04me
+//GOOG1EUYNBI3KOHNKYAXUPARZXNN5OLGSHPQSGJ5OJJBFRNTNR6DX6N7RUYEQ
+
+app.post("/addRequest", upload.single("image"), async (req, res) => {
+  const { email, referralCode, package } = req.body;
+  if (!req.file) {
+    return res.status(400).json({ error: "No image file provided" });
+  }
+  console.log(req.body.email);
+  const filename = `${Date.now()}-${path.basename(
+    req.file.originalname
+  )}-${email}`;
+
   try {
-    // const newRequest = new Requests({
-    //   email,
-    //   referralCode,
-    //   package,
-    //   Image,
-    // });
-    // newRequest.save();
-    res.status(200).json({ message: "Request Added successful" });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Server error" });
+    // Upload the image to Google Cloud Storage bucket
+    const bucketName = "transaction_proofs";
+    const bucket = GoogleStorage.bucket(bucketName);
+    const file = bucket.file(filename);
+
+    await file.save(req.file.buffer, {
+      metadata: {
+        contentType: req.file.mimetype,
+      },
+    });
+
+    // Get the URL to the uploaded image
+    const imageLink = `https://storage.googleapis.com/${bucketName}/${filename}`;
+    const newRequest = new Requests({
+      email,
+      referralCode,
+      package,
+      Image: imageLink,
+    });
+    await newRequest.save();
+    return res.status(200).json({ message: "Image uploaded successfully" });
+  } catch (err) {
+    console.error("Error uploading image:", err);
+    return res.status(500).json({ error: "Error uploading image" });
   }
 });
 

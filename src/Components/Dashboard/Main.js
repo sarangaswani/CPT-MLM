@@ -13,8 +13,10 @@ import {
 import { getGlobalState } from "../../store/global";
 import { FiSend } from "react-icons/fi";
 import Cookies from "js-cookie";
+import { useNavigate } from "react-router-dom";
 
 function Main() {
+  const navigate = useNavigate();
   const userData = Cookies.get("user");
   var data2 = JSON.parse(userData);
   const allRef = getGlobalState("allReferralsLength");
@@ -52,11 +54,15 @@ function Main() {
           }}
         >
           <h1 className="text-white text-xl font-bold p-4 text-left">
-            Choose from multiple Mether World packages
+            Choose your package for a better future
           </h1>
           <button
             type="button"
             className="focus:outline-none text-white bg-purple-700 hover:bg-purple-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-2 dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-900 self-start ml-3"
+            onClick={() => {
+              navigate("/Dashboard/Shop");
+            }}
+            // href="/Dashboard/Shop"
           >
             Buy now
           </button>
