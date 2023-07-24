@@ -5,9 +5,13 @@ const argon2 = require("argon2");
 const jwt = require("jsonwebtoken");
 const cors = require("cors");
 const secret = "./config";
+const multer = require("multer");
+const dotenv = require("dotenv");
 
+const upload = multer();
 const app = express();
 app.use(cors());
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 // connectDb();
@@ -41,6 +45,7 @@ const UserSchema = new mongoose.Schema({
   joinningDate: { type: Date, default: Date.now },
   totalEarning: Number,
   rank: String,
+  rankAchieved: { type: [String] },
   walletAdress: String,
   referralBonusEvents: [
     // this is array of object, it will store all the invited users when they will join using current user refferalCode
@@ -53,15 +58,20 @@ const UserSchema = new mongoose.Schema({
       Earned: Number,
     },
   ],
-  rewards: [
+  rewards: {
+    choice1: String,
+    choice2: String,
+  },
+  rewardsClaimed: [
     {
       time: { type: Date, default: Date.now },
       choice1: String,
       choice2: String,
+      choosen: String,
+      rank: String,
     },
   ],
   dailyStackingEvents: [
-    // this will store daily staking
     {
       time: { type: Date, default: Date.now },
       amount: Number,
@@ -71,6 +81,45 @@ const UserSchema = new mongoose.Schema({
 });
 
 const User = mongoose.model("User", UserSchema);
+
+const RequestsSchema = new mongoose.Schema({
+  email: String,
+  referralCode: String, // referralCode of current user
+  package: String,
+  Image: String,
+});
+const Requests = mongoose.model("Requests", RequestsSchema);
+
+const RankAndRewardsSchema = new mongoose.Schema({
+  email: String,
+  referralCode: String, // referralCode of current user
+  choice: String,
+  rank: String,
+  HomeAddress: String,
+  PhoneNumber: String,
+  EthAddress: String,
+});
+
+const RankAndReward = mongoose.model("RankAndReward", RankAndRewardsSchema);
+
+app.post("/addRequest", async (req, res) => {
+  console.log("incoming datas", req.body);
+  const { email, referralCode, package, Image } = req.body;
+  console.log(email, referralCode, package, Image);
+  try {
+    // const newRequest = new Requests({
+    //   email,
+    //   referralCode,
+    //   package,
+    //   Image,
+    // });
+    // newRequest.save();
+    res.status(200).json({ message: "Request Added successful" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
 
 async function generateUniqueRandomNumber(min, max) {
   let unique = false;
@@ -119,125 +168,125 @@ const processDailyStakingRewards = async () => {
 setTimeout(processDailyStakingRewards, 24 * 60 * 60 * 1000);
 // --------------------------------UPDATING TOTAL BUSINESS-------------------------------------------------------//
 
-// const calculateTotalBusiness = async (referredBy) => {
-//   if (!referredBy) {
-//     throw new Error("referredBy is required");
-//   }
+const calculateTotalBusiness = async (referredBy) => {
+  if (!referredBy) {
+    throw new Error("referredBy is required");
+  }
 
-//   const user = await User.findOne({ referralCode: referredBy });
-//   if (!user) {
-//     throw new Error("User not found");
-//   }
+  const user = await User.findOne({ referralCode: referredBy });
+  if (!user) {
+    throw new Error("User not found");
+  }
 
-//   if (user.directReferrals.length < 3) {
-//     throw new Error("Less than 3 direct referrals");
-//   }
+  if (user.directReferrals.length < 3) {
+    throw new Error("Less than 3 direct referrals");
+  }
 
-//   let referralsBusiness = [];
-//   for (let referralCode of user.directReferrals) {
-//     const referralUser = await User.findOne({ referralCode });
-//     if (referralUser && referralUser.totalBusiness > 0) {
-//       referralsBusiness.push(referralUser.totalBusiness);
-//     }
-//   }
+  let referralsBusiness = [];
+  for (let referralCode of user.directReferrals) {
+    const referralUser = await User.findOne({ referralCode });
+    if (referralUser && referralUser.totalBusiness > 0) {
+      referralsBusiness.push(referralUser.totalBusiness);
+    }
+  }
 
-//   if (referralsBusiness.length < 3)
-//     throw new Error("Less than 3 referrals with non-zero totalBusiness");
+  if (referralsBusiness.length < 3)
+    throw new Error("Less than 3 referrals with non-zero totalBusiness");
 
-//   referralsBusiness.sort((a, b) => b - a);
+  referralsBusiness.sort((a, b) => b - a);
 
-//   const totalBusiness =
-//     referralsBusiness[0] * 0.5 +
-//     referralsBusiness[1] * 0.3 +
-//     referralsBusiness.slice(2).reduce((a, b) => a + b, 0) * 0.2;
+  const totalBusiness =
+    referralsBusiness[0] * 0.5 +
+    referralsBusiness[1] * 0.3 +
+    referralsBusiness.slice(2).reduce((a, b) => a + b, 0) * 0.2;
 
-//   console.log(totalBusiness);
+  console.log(totalBusiness);
 
-//   user.totalBusiness = totalBusiness;
-//   if (totalBusiness >= 10000000) {
-//     user.rank = "Royal Crown Diamond";
-//     user.rewards.push({
-//       choice1: 250000,
-//       choice2: "Farm House",
-//     });
-//   } else if (totalBusiness >= 5000000) {
-//     user.rank = "Crown Diamond";
-//     user.rewards.push({
-//       time: new Date(),
-//       choice1: 125000,
-//       choice2: "Villa",
-//     });
-//   } else if (totalBusiness >= 2500000) {
-//     user.rank = "Diamond";
-//     user.rewards.push({
-//       time: new Date(),
-//       choice1: 50000,
-//       choice2: "Flat in Delhi(Metro City)",
-//     });
-//   } else if (totalBusiness >= 1000000) {
-//     user.rewards.push({
-//       time: new Date(),
-//       choice1: 20000,
-//       choice2: "SUV Car",
-//     });
-//     user.rank = "Platinum";
-//   } else if (totalBusiness >= 500000) {
-//     user.rewards.push({
-//       time: new Date(),
-//       choice1: 10000,
-//       choice2: "Sedan Car",
-//     });
-//     user.rank = "Gold";
-//   } else if (totalBusiness >= 250000) {
-//     user.rewards.push({
-//       time: new Date(),
-//       choice1: 5000,
-//       choice2: "Small Car",
-//     });
-//     user.rank = "Silver";
-//   } else if (totalBusiness >= 100000) {
-//     user.rewards.push({
-//       time: new Date(),
-//       choice1: 2500,
-//       choice2: "Bullet Bike",
-//     });
-//     user.rank = "Executive";
-//   } else if (totalBusiness >= 50000) {
-//     user.rewards.push({
-//       time: new Date(),
-//       choice1: 1000,
-//       choice2: "Bike",
-//     });
-//     user.rank = "Senior";
-//   } else if (totalBusiness >= 25000) {
-//     user.rewards.push({
-//       time: new Date(),
-//       choice1: 500,
-//       choice2: "Laptop",
-//     });
-//     user.rank = "Star";
-//   } else if (totalBusiness >= 1000) {
-//     user.rewards.push({
-//       time: new Date(),
-//       choice1: 200,
-//       choice2: "Mobile Phone",
-//     });
-//     user.rank = "Distributer";
-//   }
+  user.totalBusiness = totalBusiness;
+  if (totalBusiness >= 10000000) {
+    user.rank = "Royal Crown Diamond";
+    user.rewards.push({
+      choice1: 250000,
+      choice2: "Farm House",
+    });
+  } else if (totalBusiness >= 5000000) {
+    user.rank = "Crown Diamond";
+    user.rewards.push({
+      time: new Date(),
+      choice1: 125000,
+      choice2: "Villa",
+    });
+  } else if (totalBusiness >= 2500000) {
+    user.rank = "Diamond";
+    user.rewards.push({
+      time: new Date(),
+      choice1: 50000,
+      choice2: "Flat in Delhi(Metro City)",
+    });
+  } else if (totalBusiness >= 1000000) {
+    user.rewards.push({
+      time: new Date(),
+      choice1: 20000,
+      choice2: "SUV Car",
+    });
+    user.rank = "Platinum";
+  } else if (totalBusiness >= 500000) {
+    user.rewards.push({
+      time: new Date(),
+      choice1: 10000,
+      choice2: "Sedan Car",
+    });
+    user.rank = "Gold";
+  } else if (totalBusiness >= 250000) {
+    user.rewards.push({
+      time: new Date(),
+      choice1: 5000,
+      choice2: "Small Car",
+    });
+    user.rank = "Silver";
+  } else if (totalBusiness >= 100000) {
+    user.rewards.push({
+      time: new Date(),
+      choice1: 2500,
+      choice2: "Bullet Bike",
+    });
+    user.rank = "Executive";
+  } else if (totalBusiness >= 50000) {
+    user.rewards.push({
+      time: new Date(),
+      choice1: 1000,
+      choice2: "Bike",
+    });
+    user.rank = "Senior";
+  } else if (totalBusiness >= 25000) {
+    user.rewards.push({
+      time: new Date(),
+      choice1: 500,
+      choice2: "Laptop",
+    });
+    user.rank = "Star";
+  } else if (totalBusiness >= 1000) {
+    user.rewards.push({
+      time: new Date(),
+      choice1: 200,
+      choice2: "Mobile Phone",
+    });
+    user.rank = "Distributer";
+  }
 
-//   await user.save();
+  await user.save();
 
-//   // If the user was referred by someone else, recursively calculate their total business
-//   if (user.referredBy) {
-//     const referredByUser = await User.findOne({
-//       referralCode: user.referredBy,
-//     });
-//     if (referredByUser && referredByUser.directReferrals.length > 2) {
-//       await calculateTotalBusiness(user.referredBy);
-//     }
-//   }
-//   return totalBusiness;
-// };
+  // If the user was referred by someone else, recursively calculate their total business
+  if (user.referredBy) {
+    const referredByUser = await User.findOne({
+      referralCode: user.referredBy,
+    });
+    if (referredByUser && referredByUser.directReferrals.length > 2) {
+      await calculateTotalBusiness(user.referredBy);
+    }
+  }
+  return totalBusiness;
+};
 
 const getDirectReferralsTotalBusiness = async (referralCode) => {
   const user = await User.findOne({ referralCode: referralCode });
@@ -260,7 +309,104 @@ const getDirectReferralsTotalBusiness = async (referralCode) => {
   const rest = referralsTotalBusiness.slice(2).reduce((a, b) => a + b, 0) * 0.2;
 
   // Return the total
-  return highest + secondHighest + rest;
+  const totalBusiness = highest + secondHighest + rest;
+
+  const rankAchieved = user.rankAchieved;
+
+  if (
+    totalBusiness >= 10000000 &&
+    user.rank !== "Royal Crown Diamond" &&
+    !rankAchieved.includes("Royal Crown Diamond")
+  ) {
+    user.rank = "Royal Crown Diamond";
+    user.rankAchieved.push("Royal Crown Diamond");
+    user.rewards.choice1 = 250000;
+    user.rewards.choice2 = "Farm House";
+  } else if (
+    totalBusiness >= 5000000 &&
+    user.rank !== "Crown Diamond" &&
+    !rankAchieved.includes("Crown Diamond")
+  ) {
+    user.rank = "Crown Diamond";
+    user.rankAchieved.push("Crown Diamond");
+    user.rewards.choice1 = 125000;
+    user.rewards.choice2 = "Villa";
+  } else if (
+    totalBusiness >= 2500000 &&
+    user.rank !== "Diamond" &&
+    !rankAchieved.includes("Diamond")
+  ) {
+    user.rank = "Diamond";
+    user.rankAchieved.push("Diamond");
+    user.rewards.choice1 = 50000;
+    user.rewards.choice2 = "Flat in Delhi(Metro City)";
+  } else if (
+    totalBusiness >= 1000000 &&
+    user.rank !== "Platinum" &&
+    !rankAchieved.includes("Platinum")
+  ) {
+    user.rewards.choice1 = 20000;
+    user.rewards.choice2 = "SUV Car";
+    user.rank = "Platinum";
+    user.rankAchieved.push("Platinum");
+  } else if (
+    totalBusiness >= 500000 &&
+    user.rank !== "Gold" &&
+    !rankAchieved.includes("Gold")
+  ) {
+    user.rewards.choice1 = 10000;
+    user.rewards.choice2 = "Sedan Car";
+    user.rank = "Gold";
+    user.rankAchieved.push("Gold");
+  } else if (
+    totalBusiness >= 250000 &&
+    user.rank !== "Silver" &&
+    !rankAchieved.includes("Silver")
+  ) {
+    user.rewards.choice1 = 5000;
+    user.rewards.choice2 = "Small Car";
+    user.rank = "Silver";
+    user.rankAchieved.push("Silver");
+  } else if (
+    totalBusiness >= 100000 &&
+    user.rank !== "Executive" &&
+    !rankAchieved.includes("Executive")
+  ) {
+    user.rewards.choice1 = 2500;
+    user.rewards.choice2 = "Bullet Bike";
+    user.rank = "Executive";
+    user.rankAchieved.push("Executive");
+  } else if (
+    totalBusiness >= 50000 &&
+    user.rank !== "Senior" &&
+    !rankAchieved.includes("Senior")
+  ) {
+    user.rewards.choice1 = 1000;
+    user.rewards.choice2 = "Bike";
+    user.rank = "Senior";
+    user.rankAchieved.push("Senior");
+  } else if (
+    totalBusiness >= 25000 &&
+    user.rank !== "Star" &&
+    !rankAchieved.includes("Star")
+  ) {
+    user.rewards.choice1 = 500;
+    user.rewards.choice2 = "Laptop";
+    user.rank = "Star";
+    user.rankAchieved.push("Star");
+  } else if (
+    totalBusiness >= 1000 &&
+    user.rank !== "Distributer" &&
+    !rankAchieved.includes("Distributer")
+  ) {
+    user.rewards.choice1 = 200;
+    user.rewards.choice2 = "Mobile Phone";
+    user.rank = "Distributer";
+    user.rankAchieved.push("Distributer");
+  }
+  await user.save();
+  console.log(user.rank, totalBusiness);
+  return totalBusiness;
 };
 
 const calculateReferralTreeBalance = async (referralCode) => {
@@ -363,6 +509,7 @@ app.post("/signup", async (req, res) => {
       1000000,
       9999999
     );
+    console.log(identificationNumber);
     const newUser = new User({
       fullName,
       email,
@@ -374,9 +521,11 @@ app.post("/signup", async (req, res) => {
       totalBusiness: 0,
       totalEarning: 0,
       rank: "Null",
+      rewards: { choice1: "Null", choice2: "Null" }, // Initialize the rewards field as an empty object
     });
 
     await newUser.save();
+    console.log("new User");
     referrer.directReferrals.push(identificationNumber);
     await referrer.save();
     res.status(200).json({ message: "User created successfully" });
@@ -419,6 +568,7 @@ app.post("/login", async (req, res) => {
       balance: user.balance,
       totalBusiness: total,
       Events: user.referralBonusEvents,
+      rewards: user.rewards,
     };
 
     // const directRef = await getDirectReferrals(user.email);
@@ -542,6 +692,44 @@ app.post("/all-referrals", async (req, res) => {
   } catch (error) {
     return res.status(500).json({ message: "Internal server error" });
   }
+});
+
+app.post("/claimRankandReward", async (req, res) => {
+  const { email, choice, HomeAddress, WalletAddress, PhoneNumber } = req.body;
+  const user = await User.findOne({ email });
+  if (!user) {
+    return res.status(404).json({ message: "User not found" });
+  }
+  if (choice === "choice1") {
+    // call cron jobs here off releasing CPT after week
+  } else if (choice === "choice2") {
+    const newRankAndReward = new RankAndReward({
+      email,
+      referralCode: user.referralCode,
+      choice,
+      rank: user.rank,
+      HomeAddress,
+      PhoneNumber,
+      WalletAddress,
+    });
+    user.rewardsClaimed.push({
+      time: new Date(),
+      choice1: user.rewards.choice1,
+      choice2: user.rewards.choice2,
+      choosen: choice,
+      rank: user.rank,
+    });
+    user.rewards = {
+      choice1: "Null",
+      choice2: "Null",
+    };
+    await user.save();
+    await newRankAndReward.save();
+  }
+});
+
+app.post("/send-cpt", async (req, res) => {
+  const { email, address, amount } = req.body;
 });
 
 const PORT = 5000;

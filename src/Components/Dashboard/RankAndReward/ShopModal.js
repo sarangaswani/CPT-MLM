@@ -2,8 +2,10 @@ import React, { useState } from "react";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-
+import Cookies from "js-cookie";
 const PortalSlider = ({ images, onClose, product }) => {
+  const userData = Cookies.get("user");
+  var currentUser = JSON.parse(userData);
   const sliderSettings = {
     dots: true,
     infinite: false,
@@ -16,14 +18,53 @@ const PortalSlider = ({ images, onClose, product }) => {
 
   const [selectedFile, setSelectedFile] = useState(null);
   const [copied, setCopied] = useState(false);
-
+  // GOOG1E6IVJNYADTEAEQW4SHDVPNEJKWTGMK4OMHNRRW6O7VAKNXGCETTCTK3Q
+  // pq2uOfbqUXj2jHRDle/xnZXVhHc8KHWqJcR8xnqo
   const handleFileChange = (e) => {
     setSelectedFile(e.target.files[0]);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (selectedFile) {
-      console.log("Selected File:", selectedFile);
+      // console.log(currentUser, selectedFile);
+      const requestData = {
+        email: currentUser.email,
+        referralCode: currentUser.referralCode,
+        package: currentUser.package,
+        // Image: selectedFile,
+      };
+      console.log(JSON.stringify(requestData));
+      const formData = new FormData();
+      formData.append("email", currentUser.email);
+      formData.append("referralCode", currentUser.referralCode);
+      formData.append("package", currentUser.package);
+      formData.append("Image", selectedFile);
+      try {
+        // for (var key of formData.entries()) {
+        //   console.log(key[0] + ", " + key[1]);
+        // }
+        // console.log(JSON.stringify(requestData));
+        const response = await fetch("http://localhost:5000/addRequest", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(requestData),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          console.log(data.message); // Log the response message from the server
+          setSelectedFile(null);
+          window.alert("Request added successfully!");
+        } else {
+          console.error("Request failed:", response.status);
+          // Handle the error appropriately (e.g., show an error message to the user)
+        }
+      } catch (error) {
+        console.error("Error:", error);
+        // Handle the error appropriately (e.g., show an error message to the user)
+      }
       setSelectedFile(null);
     }
     onClose();
@@ -47,7 +88,11 @@ const PortalSlider = ({ images, onClose, product }) => {
           <Slider {...sliderSettings}>
             {images.map((item, index) => (
               <div key={index}>
-                <img src={item.image} alt={item.name} className="w-56 mx-auto" />
+                <img
+                  src={item.image}
+                  alt={item.name}
+                  className="w-56 mx-auto"
+                />
                 <div className="flex flex-col h-20 sm:h-24 my-4 whitespace-normal">
                   <p className="text-lg font-bold">Currency: {item.name}</p>
                   <p
@@ -57,7 +102,9 @@ const PortalSlider = ({ images, onClose, product }) => {
                     Public Address: {item.address}
                   </p>
                   {copied && (
-                    <p className="text-sm text-green-600">Address copied to clipboard!</p>
+                    <p className="text-sm text-green-600">
+                      Address copied to clipboard!
+                    </p>
                   )}
                 </div>
               </div>

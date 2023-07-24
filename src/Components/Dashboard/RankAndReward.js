@@ -2,30 +2,50 @@ import React, { useState } from "react";
 import RankCard from "./RankAndReward/RankCard";
 import RewardCard from "./RankAndReward/RewardCard";
 import { FaAward, FaTrophy } from "react-icons/fa";
+import Cookies from "js-cookie";
 function RankAndReward() {
-  const rewardsData = [
-    {
-      title: "Reward 1",
-      description: "Description of Reward 1",
-      image: "path/to/reward1-image.png",
-    },
-    {
-      title: "Reward 2",
-      description: "Description of Reward 2",
-      image: "path/to/reward2-image.png",
-    },
-    {
-      title: "Reward 3",
-      description: "Description of Reward 3",
-      image: "path/to/reward2-image.png",
-    },
-    // Add more reward objects as needed
-  ];
+  const userData = Cookies.get("user");
+  var currentUser = JSON.parse(userData);
+  console.log(currentUser);
   const [selectedOption, setSelectedOption] = useState(null);
+  const [ethAddress, setEthAddress] = useState("");
+  const [homeAddress, setHomeAddress] = useState("");
+  const [mobileNumber, setMobileNumber] = useState("");
+  console.log(currentUser.rewards.choice1);
 
   const handleRewardSelection = (option) => {
     setSelectedOption(option);
   };
+
+  const handleClaimReward = async () => {
+    const values = {
+      WalletAddress: ethAddress,
+      HomeAddress: homeAddress,
+      PhoneNumber: mobileNumber,
+      email: currentUser.email,
+      referralCode: currentUser.referralCode,
+      choice: selectedOption,
+      rank: currentUser.rank,
+    };
+    const response = await fetch("http://localhost:5000/claimRankandReward", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ values }),
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      console.log(data.message); // Log the response message from the server
+      setSelectedOption(null);
+      window.alert("Reward Claimed successfully!");
+    } else {
+      console.log("Error");
+    }
+  };
+  const rewardsAvailable =
+    currentUser.rank && currentUser.rewards.choice1 !== "Null";
 
   return (
     <>
@@ -42,72 +62,117 @@ function RankAndReward() {
               type="button"
               class="focus:outline-none text-white bg-yellow-500   font-medium rounded-lg text-sm px-5 py-2.5  dark:bg-yellow-500  flex items"
             >
-              Total Business: 0
+              Total Business: $ {currentUser.totalBusiness}
             </button>
           </div>
         </div>
       </div>
 
-      <div className="bg-white flex flex-col p-10 rounded-xl mt-4 overflow-x-auto">
-        <h1 className="flex text-3xl font-semibold mb-8 justify-center">
-          <div className="text-yellow-500 text-3xl flex justify-center items-center mr-3">
-            <FaTrophy />
+      {currentUser.rewards.choice1 !== "Null" || currentUser.rank !== "Null" ? (
+        <div className="bg-white flex flex-col p-10 rounded-xl mt-4 overflow-x-auto">
+          <h1 className="flex text-3xl font-semibold mb-8 justify-center">
+            <div className="text-yellow-500 text-3xl flex justify-center items-center mr-3">
+              <FaTrophy />
+            </div>
+            Congratulations on acquiring {currentUser.rank} Rank
+            <div className="text-yellow-500 text-3xl flex justify-center items-center ml-3">
+              <FaTrophy />
+            </div>
+          </h1>
+
+          {/* Render Rank Cards */}
+
+          <div className="grid grid-cols-1 md:grid-cols-1 gap-4 mb-8 ">
+            <RankCard rank="1" title="Choose your reward" />
           </div>
-          Congratulations on acquiring Gold Rank
-          <div className="text-yellow-500 text-3xl flex justify-center items-center ml-3">
-            <FaTrophy />
+
+          {/* Render Reward Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <label className="border border-gray-300 rounded-lg shadow-md p-4 cursor-pointer">
+              <div className="flex justify-between">
+                <div>
+                  <h3 className="text-xl font-semibold mb-2">
+                    $ {currentUser.rewards.choice1}
+                  </h3>
+                  <p className="text-gray-600">
+                    Get $100 worth TCP tokens that will be claimable in one week
+                  </p>
+                </div>
+                <input
+                  type="radio"
+                  name="rewardOption"
+                  checked={selectedOption === "choice1"}
+                  onChange={() => handleRewardSelection("choice1")}
+                />
+              </div>
+              {selectedOption === "choice1" && (
+                <div className="mt-4">
+                  <label className="block mb-2 font-semibold">
+                    Ethereum Address:
+                  </label>
+                  <input
+                    type="text"
+                    className="border border-gray-300 rounded-md p-2 w-full"
+                    value={ethAddress}
+                    onChange={(e) => setEthAddress(e.target.value)}
+                  />
+                </div>
+              )}
+            </label>
+
+            <label className="border border-gray-300 rounded-lg shadow-md p-4 cursor-pointer">
+              <div className="flex justify-between">
+                <div>
+                  <h3 className="text-xl font-semibold mb-2">
+                    {currentUser.rewards.choice2}
+                  </h3>
+                  <p className="text-gray-600 ">
+                    Get $200 worth mobile phone, that will be delivere in 2
+                    weeks
+                  </p>
+                </div>
+                <input
+                  type="radio"
+                  name="rewardOption"
+                  checked={selectedOption === "choice2"}
+                  onChange={() => handleRewardSelection("choice2")}
+                />
+              </div>
+              {selectedOption === "choice2" && (
+                <div className="mt-4">
+                  <label className="block mb-2 font-semibold">
+                    Home Address:
+                  </label>
+                  <input
+                    type="text"
+                    className="border border-gray-300 rounded-md p-2 w-full"
+                    value={homeAddress}
+                    onChange={(e) => setHomeAddress(e.target.value)}
+                  />
+                  <label className="block mt-4 mb-2 font-semibold">
+                    Mobile Number:
+                  </label>
+                  <input
+                    type="text"
+                    className="border border-gray-300 rounded-md p-2 w-full"
+                    value={mobileNumber}
+                    onChange={(e) => setMobileNumber(e.target.value)}
+                  />
+                </div>
+              )}
+            </label>
           </div>
-        </h1>
-
-        {/* Render Rank Cards */}
-
-        <div className="grid grid-cols-1 md:grid-cols-1 gap-4 mb-8 ">
-          <RankCard
-            rank="1"
-            title="Gold Rank"
-            description="Achieve the Gold rank and get exclusive rewards."
-          />
+          <button
+            type="button"
+            class="focus:outline-none text-white bg-yellow-500 hover:bg-yellow-400 font-medium rounded-lg text-sm px-5 py-2.5 mt-6"
+            onClick={handleClaimReward}
+          >
+            CLaim Reward
+          </button>
         </div>
-
-        {/* Render Reward Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <label className="border border-gray-300 rounded-lg shadow-md p-4 cursor-pointer">
-          <div className="flex justify-between">
-            <div>
-            <h3 className="text-xl font-semibold mb-2">Reward 1</h3>
-            <p className="text-gray-600">Description of Reward 1</p>
-            </div>
-            <input
-              type="radio"
-              name="rewardOption"
-              checked={selectedOption === "option1"}
-              onChange={() => handleRewardSelection("option1")}
-            />
-            </div>
-          </label>
-
-          <label className="border border-gray-300 rounded-lg shadow-md p-4 cursor-pointer">
-          <div className="flex justify-between">
-          <div>
-            <h3 className="text-xl font-semibold mb-2">Reward 2</h3>
-            <p className="text-gray-600 ">Description of Reward 2</p>
-            </div>
-            <input
-              type="radio"
-              name="rewardOption"
-              checked={selectedOption === "option2"}
-              onChange={() => handleRewardSelection("option2")}
-            />
-            </div>
-          </label>
-        </div>
-        <button
-          type="button"
-          class="focus:outline-none text-white bg-yellow-500 hover:bg-yellow-400 font-medium rounded-lg text-sm px-5 py-2.5 mt-6"
-        >
-          CLaim Reward
-        </button>
-      </div>
+      ) : (
+        <> </>
+      )}
     </>
   );
 }

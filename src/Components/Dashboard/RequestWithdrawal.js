@@ -82,7 +82,7 @@ const RequestWithdrawal = () => {
                   htmlFor="eBankBalance"
                   className="block font-medium text-gray-700"
                 >
-                  eBank Balance:
+                  eBank Balance in CPT:
                 </label>
                 <Field
                   type="text"
