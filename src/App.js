@@ -16,28 +16,53 @@ import { setGlobalState } from "./store/global";
 
 function App() {
   const [loggedIn, setLoggedIn] = useState(false);
-  const userData = Cookies.get("user");
-  var data2 = JSON.parse(userData);
-  const fetchDirectAff = async () => {
-    const values = {
-      email: data2.email,
-    };
-    const response = await fetch(`http://localhost:5000/all-referrals`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(values),
-    });
-    const data = await response.json();
-    setGlobalState("allReferralsLength", data.allRefLength);
-    setGlobalState("paid", data.nonNullPackageCount);
-    setGlobalState("unpaid", data.nullPackageCount);
+  const fetchDirectAff = async (email) => {
+    try {
+      const values = {
+        email: email,
+      };
+      const response = await fetch(`http://localhost:5000/all-referrals`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(values),
+      });
+      const data = await response.json();
 
-    // setallReferrals(data.allReferralObjects);
-    // setPaid(data.nonNullPackageCount);
-    // setUnPaid(data.nullPackageCount);
-    console.log(data);
+      // Check if cookies are already set
+      const existingRefCookie = Cookies.get("ref");
+      const obj = {
+        paid: data.nonNullPackageCount,
+        unpaid: data.nullPackageCount,
+        allRefLength: data.allRefLength,
+      };
+
+      if (!existingRefCookie) {
+        // If the 'ref' cookie doesn't exist, set it
+        Cookies.set("ref", JSON.stringify(obj), {
+          expires: 7,
+          secure: true,
+          sameSite: "strict",
+        });
+      } else {
+        // If the 'ref' cookie already exists, update its value
+        const existingRefObj = JSON.parse(existingRefCookie);
+        Object.assign(existingRefObj, obj);
+        Cookies.set("ref", JSON.stringify(existingRefObj), {
+          expires: 7,
+          secure: true,
+          sameSite: "strict",
+        });
+      }
+
+      // Update the global state with the fetched data
+      setGlobalState("allReferralsLength", data.allRefLength);
+      setGlobalState("paid", data.nonNullPackageCount);
+      setGlobalState("unpaid", data.nullPackageCount);
+    } catch (error) {
+      // Handle any errors
+    }
   };
 
   useEffect(() => {
@@ -46,7 +71,9 @@ function App() {
       const token = Cookies.get("authToken");
 
       if (token) {
-        fetchDirectAff();
+        const userData = Cookies.get("user");
+        var data2 = JSON.parse(userData);
+        fetchDirectAff(data2.email);
         setLoggedIn(true);
       } else {
         setLoggedIn(false);

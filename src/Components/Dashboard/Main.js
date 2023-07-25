@@ -19,6 +19,8 @@ function Main() {
   const navigate = useNavigate();
   const userData = Cookies.get("user");
   var data2 = JSON.parse(userData);
+  const refCookie = Cookies.get("ref");
+  const refObj = JSON.parse(refCookie);
   const allRef = getGlobalState("allReferralsLength");
   const content = [
     {
@@ -32,14 +34,15 @@ function Main() {
       name: "Affiliate Network",
       decs: "My Team Network",
       label: "Team Count",
-      members: `${allRef} Members`,
+      members: `${refObj.allRefLength} Members`,
       imageUrl: <FontAwesomeIcon icon={faPaperPlane} size="xl" />,
     },
     {
       name: "My Account",
       decs: "My Team Business",
       label: "Total Business",
-      members: `${data2.totalBusiness} $`,
+      members: `${!data2.totalBusiness ? "0" : data2.totalBusiness} $`,
+
       imageUrl: <MdAttachMoney size={24} color="black" />,
     },
     // Add more user objects as needed
@@ -120,7 +123,7 @@ function Main() {
           <MdAccountBalance size={32} />
           <div className="ml-3">
             <h1 className="text-black font-semibold">Invested Amount</h1>
-            <p className="text-sm">Total: {data2.balanceinDoll}$</p>
+            <p className="text-sm">Total: $ {data2.balanceinDoll}</p>
           </div>
         </div>
         <div className="bg-green-300 p-4 rounded-xl flex items-center">

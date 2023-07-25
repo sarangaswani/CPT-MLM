@@ -9,6 +9,7 @@ const multer = require("multer");
 const path = require("path");
 const dotenv = require("dotenv");
 const { Storage } = require("@google-cloud/storage");
+const bcrypt = require("bcrypt");
 // const upload = multer();
 const app = express();
 app.use(cors());
@@ -124,51 +125,6 @@ const GoogleStorage = new Storage({
 });
 //dOuTDE8WrJb8pO+i5KkTJ3wQTBo/OEV9rgb04me
 //GOOG1EUYNBI3KOHNKYAXUPARZXNN5OLGSHPQSGJ5OJJBFRNTNR6DX6N7RUYEQ
-
-app.post("/addRequest", upload.single("image"), async (req, res) => {
-  const { email, referralCode, package, amount } = req.body;
-  const reqq = await Requests.findOne({ email: email });
-  if (reqq) {
-    if ((reqq.Decision = "Not Decided")) {
-      return res.status(400).json({ error: "Request already sent" });
-    }
-  }
-  if (!req.file) {
-    return res.status(400).json({ error: "No image file provided" });
-  }
-  console.log(req.body.email);
-  const filename = `${Date.now()}-${path.basename(
-    req.file.originalname
-  )}-${email}`;
-
-  try {
-    // Upload the image to Google Cloud Storage bucket
-    const bucketName = "transaction_proofs";
-    const bucket = GoogleStorage.bucket(bucketName);
-    const file = bucket.file(filename);
-
-    await file.save(req.file.buffer, {
-      metadata: {
-        contentType: req.file.mimetype,
-      },
-    });
-
-    // Get the URL to the uploaded image
-    const imageLink = `https://storage.googleapis.com/${bucketName}/${filename}`;
-    const newRequest = new Requests({
-      email,
-      referralCode,
-      package,
-      Image: imageLink,
-      amount,
-    });
-    await newRequest.save();
-    return res.status(200).json({ message: "Image uploaded successfully" });
-  } catch (err) {
-    console.error("Error uploading image:", err);
-    return res.status(500).json({ error: "Error uploading image" });
-  }
-});
 
 async function generateUniqueRandomNumber(min, max) {
   let unique = false;
@@ -532,10 +488,24 @@ const handleInvestment = async (userId, investmentAmount, userPackage) => {
 // ---------------------------------------------------------------------------- //
 app.post("/invest", async (req, res) => {
   console.log(req.body);
-  const { userId, amount, package } = req.body;
+  const { email, decision } = req.body;
   try {
-    await handleInvestment(userId, amount, package);
-    res.status(200).json({ message: "Investment successful" });
+    const request = await Requests.findOne({ email });
+    if (!request) {
+      return res.status(400).json({ message: "Request not found" });
+    }
+    if (decision === "Accepted") {
+      await handleInvestment(email, request.amount, request.package);
+      request.Decision = "Accepted";
+      await request.save();
+      res.status(200).json({ message: "Investment successful" });
+    } else if (decision === "Rejected") {
+      request.Decision = "Rejected";
+      await request.save();
+      res.status(200).json({ message: "Investment Rejected" });
+    } else {
+      res.status(400).json({ message: "Invalid decision" });
+    }
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error" });
@@ -554,6 +524,10 @@ app.post("/signup", async (req, res) => {
     if (!referrer) {
       return res.status(400).json({ message: "Referral code does not exist" });
     }
+
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
     const identificationNumber = await generateUniqueRandomNumber(
       1000000,
       9999999
@@ -562,7 +536,7 @@ app.post("/signup", async (req, res) => {
     const newUser = new User({
       fullName,
       email,
-      password,
+      password: hashedPassword,
       referralCode: identificationNumber,
       referredBy: referralCode, // referredBy will be referrer's _id
       package: "Null",
@@ -594,7 +568,8 @@ app.post("/login", async (req, res) => {
     }
     console.log(user);
 
-    if (user.password !== password) {
+    const passwordMatch = await bcrypt.compare(password, user.password);
+    if (!passwordMatch) {
       return res.status(400).json({ error: "Invalid password" });
     }
     const token = jwt.sign({ userId: user._id }, secret, { expiresIn: "1h" });
@@ -672,6 +647,7 @@ app.post("/direct-referrals", async (req, res) => {
 
 app.post("/all-referrals", async (req, res) => {
   const { email } = req.body;
+  console.log("called", email);
   let allReferralObjects = [];
   try {
     const user = await User.findOne({ email });
@@ -802,8 +778,104 @@ app.post("/claimRankandReward", async (req, res) => {
   return res.status(500).json({ message: "Internal server error" });
 });
 
-app.post("/send-cpt", async (req, res) => {
+// ------------------------------------- SEND PACKAGE REQUEST ---------------------------------- //
+app.post("/addRequest", upload.single("image"), async (req, res) => {
+  const { email, referralCode, package, amount } = req.body;
+  const reqq = await Requests.findOne({ email: email });
+  const user = await Users.findOne({ email: email });
+  if (reqq) {
+    if (reqq.Decision === "Not Decided") {
+      return res.status(400).json({ error: "Request already sent" });
+    } else if (user.package !== "Null") {
+      return res.status(400).json({ error: "You have already invested" });
+    }
+  }
+  if (!req.file) {
+    return res.status(400).json({ error: "No image file provided" });
+  }
+  console.log(req.body.email);
+  const filename = `${Date.now()}-${path.basename(
+    req.file.originalname
+  )}-${email}`;
+
+  try {
+    // Upload the image to Google Cloud Storage bucket
+    const bucketName = "transaction_proofs";
+    const bucket = GoogleStorage.bucket(bucketName);
+    const file = bucket.file(filename);
+
+    await file.save(req.file.buffer, {
+      metadata: {
+        contentType: req.file.mimetype,
+      },
+    });
+
+    // Get the URL to the uploaded image
+    const imageLink = `https://storage.googleapis.com/${bucketName}/${filename}`;
+    const newRequest = new Requests({
+      email,
+      referralCode,
+      package,
+      Image: imageLink,
+      amount,
+    });
+    await newRequest.save();
+    return res.status(200).json({ message: "Image uploaded successfully" });
+  } catch (err) {
+    console.error("Error uploading image:", err);
+    return res.status(500).json({ error: "Error uploading image" });
+  }
+});
+
+// ------------------------------------- GET REQUESTS ---------------------------------- //
+app.post("/getNewRequests", async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (email === "wasee62313@gmail.com") {
+      const requests = await Requests.find({ Decision: "Not Decided" }).exec(); // only send those requests which are not decided
+      console.log(requests);
+      return res.status(200).json({ requests });
+    } else {
+      return res.status(400).json({ error: "You are not admin" });
+    }
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+app.post("/getAllRequests", async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (email === "wasee62313@gmail.com") {
+      const requests = await Requests.find({
+        Decision: { $ne: "Not Decided" },
+      }).exec();
+      return res.status(200).json({ requests });
+    } else {
+      return res.status(400).json({ error: "You are not admin" });
+    }
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// ------------------------------------- DECIDE REQUESTS ---------------------------------- //  // only admin can decide
+
+app.post("/withdraw-cpt", async (req, res) => {
   const { email, address, amount } = req.body;
+  const user = await Users.findOne({ email });
+  if (!user) {
+    return res.status(400).json({ error: "User not found" });
+  }
+  if (user.balanceinCpt < amount) {
+    return res.status(400).json({ error: "Insufficient balance" });
+  }
+  user.balanceinCpt -= amount;
+  user.totalEarning += amount;
+  //
+  await user.save();
 });
 
 const PORT = 5000;

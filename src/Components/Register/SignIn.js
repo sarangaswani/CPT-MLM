@@ -6,6 +6,7 @@ import Session from "react-session-api"; // Import Session
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import { useEffect } from "react";
+import { setGlobalState } from "../../store/global";
 const validationSchema = Yup.object().shape({
   email: Yup.string()
     .email("Invalid email address")
@@ -59,6 +60,8 @@ export default function Example() {
           email: "wasee62313@gmail.com",
         };
 
+        await fetchDirectAff(values.email);
+
         // Redirect to Dashboard
         navigate("/Dashboard");
       }
@@ -66,9 +69,67 @@ export default function Example() {
       console.log("Catch is called ", error);
     }
   };
+
+  const fetchDirectAff = async (email) => {
+    try {
+      const values = {
+        email: email,
+      };
+      const response = await fetch(`http://localhost:5000/all-referrals`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(values),
+      });
+      const data = await response.json();
+
+      console.log(data);
+
+      // Check if cookies are already set
+      const existingRefCookie = Cookies.get("ref");
+      const obj = {
+        paid: data.nonNullPackageCount,
+        unpaid: data.nullPackageCount,
+        allRefLength: data.allRefLength,
+      };
+
+      if (!existingRefCookie) {
+        // If the 'ref' cookie doesn't exist, set it
+        Cookies.set("ref", JSON.stringify(obj), {
+          expires: 7,
+          secure: true,
+          sameSite: "strict",
+        });
+      } else {
+        // If the 'ref' cookie already exists, update its value
+        const existingRefObj = JSON.parse(existingRefCookie);
+        Object.assign(existingRefObj, obj);
+        Cookies.set("ref", JSON.stringify(existingRefObj), {
+          expires: 7,
+          secure: true,
+          sameSite: "strict",
+        });
+      }
+
+      // Update the global state with the fetched data
+      setGlobalState("allReferralsLength", data.allRefLength);
+      setGlobalState("paid", data.nonNullPackageCount);
+      setGlobalState("unpaid", data.nullPackageCount);
+      navigate("/Dashboard");
+    } catch (error) {
+      // Handle any errors
+    }
+  };
+
   useEffect(() => {
     if (token) {
-      navigate("/Dashboard");
+      console.log(token);
+      const userData = Cookies.get("user");
+      var data2 = JSON.parse(userData);
+      console.log(data2);
+      console.log("email", userData.email);
+      fetchDirectAff(data2.email);
     }
   }, []);
 
@@ -117,7 +178,7 @@ export default function Example() {
 
             <div>
               <div>
-                <div className="flex items-center justify-between">
+                {/* <div className="flex items-center justify-between">
                   <label
                     htmlFor="password"
                     className="block text-sm font-medium leading-6 text-white"
@@ -132,7 +193,7 @@ export default function Example() {
                       Forgot password?
                     </a>
                   </div>
-                </div>
+                </div> */}
                 <div className="mt-2">
                   <Field
                     id="password"

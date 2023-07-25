@@ -87,6 +87,8 @@ export default function NavButtons(props) {
                   <a
                     onClick={() => {
                       Cookies.remove("authToken");
+                      Cookies.remove("user");
+                      Cookies.remove("ref");
                       props.navigate("/", { replace: true });
                     }}
                     className={props.classNames(

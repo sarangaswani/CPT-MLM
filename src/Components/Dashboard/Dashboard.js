@@ -22,10 +22,12 @@ import AllRequests from "./AllRequests";
 import NewRequests from "./NewRequests";
 
 const Dashboard = ({ match }) => {
+  const [updatedNavigation, setUpdatedNavigation] = useState([]);
   const token = Cookies.get("authToken");
   const userData = Cookies.get("user");
   var data2 = JSON.parse(userData);
-  const allRef = getGlobalState("allReferralsLength");
+  console.log(data2);
+  // const allRef = getGlobalState("allReferralsLength");
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleDropdown = () => {
@@ -47,7 +49,7 @@ const Dashboard = ({ match }) => {
         },
       ],
     },
-   
+
     {
       name: "My Earnings",
       href: "#",
@@ -80,19 +82,21 @@ const Dashboard = ({ match }) => {
         },
       ],
     },
-    
-    { name: "Requests", href: "#",
-    subitems: [
-      {
-        name: "New Requests",
-        href: "/Dashboard/Requests/New-Requests",
-      },
-      {
-        name: "All Requests",
-        href: "/Dashboard/Requests/All-Requests",
-      },
-    ], },
-   
+
+    {
+      name: "Requests",
+      href: "#",
+      subitems: [
+        {
+          name: "New Requests",
+          href: "/Dashboard/Requests/New-Requests",
+        },
+        {
+          name: "All Requests",
+          href: "/Dashboard/Requests/All-Requests",
+        },
+      ],
+    },
   ];
 
   function classNames(...classes) {
@@ -103,8 +107,25 @@ const Dashboard = ({ match }) => {
     if (!token) {
       navigate("/", { replace: true });
     } else {
+      const newNavigation = [...navigation];
+
+      // Check if the email is not "wasee62313@gmail.com"
+      if (data2.email !== "wasee62313@gmail.com") {
+        // Find the index of the "Requests" section in the navigation array
+        const requestsIndex = newNavigation.findIndex(
+          (item) => item.name === "Requests"
+        );
+
+        // If the "Requests" section is found, remove it from the newNavigation array
+        if (requestsIndex !== -1) {
+          newNavigation.splice(requestsIndex, 1);
+        }
+      }
+
+      // Update the state with the updated navigation array
+      setUpdatedNavigation(newNavigation);
       // console.log(data2);
-      console.log(allRef);
+      // console.log(allRef);
     }
   }, [token]);
 
@@ -124,7 +145,7 @@ const Dashboard = ({ match }) => {
             <MobileMenu
               isOpen={isOpen}
               setIsOpen={setIsOpen}
-              navigation={navigation}
+              navigation={updatedNavigation}
               Active={Active}
               setActive={setActive}
               classNames={classNames}
@@ -138,7 +159,7 @@ const Dashboard = ({ match }) => {
             <DesktopMenu
               isOpen={isOpen}
               setIsOpen={setIsOpen}
-              navigation={navigation}
+              navigation={updatedNavigation}
               Active={Active}
               setActive={setActive}
               classNames={classNames}
@@ -176,14 +197,8 @@ const Dashboard = ({ match }) => {
                 path="eBank/Request-Withdrawal"
                 element={<RequestWithdrawal />}
               />
-              <Route
-                path="Requests/All-Requests"
-                element={<AllRequests />}
-              />
-              <Route
-                path="Requests/New-Requests"
-                element={<NewRequests />}
-              />
+              <Route path="Requests/All-Requests" element={<AllRequests />} />
+              <Route path="Requests/New-Requests" element={<NewRequests />} />
               {/* Add more Route components for each navigation item */}
             </Routes>
           </div>
