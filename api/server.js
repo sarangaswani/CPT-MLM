@@ -297,11 +297,21 @@ const getDirectReferralsTotalBusiness = async (referralCode) => {
   const user = await User.findOne({ referralCode: referralCode });
   if (!user) throw new Error("User not found");
 
+  if (user.directReferrals.length < 3) {
+    return 0;
+  }
+
   let referralsTotalBusiness = [];
 
   for (let referralCode of user.directReferrals) {
     const totalBusiness = await calculateReferralTreeBalance(referralCode);
-    referralsTotalBusiness.push(totalBusiness);
+    if (totalBusiness > 0) {
+      referralsTotalBusiness.push(totalBusiness);
+    }
+  }
+  if (referralsTotalBusiness.length < 3) {
+    // if less than 3 has no total business
+    return 0;
   }
 
   // Sort in descending order
@@ -782,7 +792,7 @@ app.post("/claimRankandReward", async (req, res) => {
 app.post("/addRequest", upload.single("image"), async (req, res) => {
   const { email, referralCode, package, amount } = req.body;
   const reqq = await Requests.findOne({ email: email });
-  const user = await Users.findOne({ email: email });
+  const user = await User.findOne({ email: email });
   if (reqq) {
     if (reqq.Decision === "Not Decided") {
       return res.status(400).json({ error: "Request already sent" });
