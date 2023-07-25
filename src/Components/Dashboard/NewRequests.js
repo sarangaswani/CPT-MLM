@@ -24,13 +24,16 @@ function NewRequests() {
   const [NewRequests, setNewRequests] = useState([]);
 
   const getNewRequests = async () => {
-    const response = await fetch(`http://localhost:5000/getNewRequests`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(values),
-    });
+    const response = await fetch(
+      `https://tcp-mlm-apis-production.up.railway.app/getNewRequests`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(values),
+      }
+    );
     const data = await response.json();
     setNewRequests(data.requests);
     console.log(data.requests);

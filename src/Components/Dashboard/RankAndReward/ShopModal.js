@@ -46,10 +46,13 @@ const PortalSlider = ({ images, onClose, product }) => {
 
       console.log(formData);
       try {
-        const response = await fetch("http://localhost:5000/addRequest", {
-          method: "POST",
-          body: formData,
-        });
+        const response = await fetch(
+          "https://tcp-mlm-apis-production.up.railway.app/addRequest",
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
 
         if (!response.ok) {
           // If the response status is not in the range 200-299, it means an error occurred

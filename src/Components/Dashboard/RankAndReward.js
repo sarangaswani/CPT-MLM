@@ -45,13 +45,16 @@ function RankAndReward() {
     };
 
     console.log(values);
-    const response = await fetch("http://localhost:5000/claimRankandReward", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ values }),
-    });
+    const response = await fetch(
+      "https://tcp-mlm-apis-production.up.railway.app/claimRankandReward",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ values }),
+      }
+    );
 
     if (response.ok) {
       const data = await response.json();

@@ -22,13 +22,16 @@ function AllRequests() {
   const [allRequests, setAllRequests] = useState([]);
 
   const fetchAllRequests = async () => {
-    const response = await fetch(`http://localhost:5000/getAllRequests`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(values),
-    });
+    const response = await fetch(
+      `https://tcp-mlm-apis-production.up.railway.app/getAllRequests`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(values),
+      }
+    );
     const data = await response.json();
     setAllRequests(data.requests);
     console.log(data.requests);
