@@ -97,7 +97,9 @@ const RequestsSchema = new mongoose.Schema({
   email: String,
   referralCode: String, // referralCode of current user
   package: String,
+  amount: String,
   Image: String,
+  Decision: { type: String, default: "Not Decided" },
 });
 const Requests = mongoose.model("Requests", RequestsSchema);
 
@@ -124,7 +126,13 @@ const GoogleStorage = new Storage({
 //GOOG1EUYNBI3KOHNKYAXUPARZXNN5OLGSHPQSGJ5OJJBFRNTNR6DX6N7RUYEQ
 
 app.post("/addRequest", upload.single("image"), async (req, res) => {
-  const { email, referralCode, package } = req.body;
+  const { email, referralCode, package, amount } = req.body;
+  const reqq = await Requests.findOne({ email: email });
+  if (reqq) {
+    if ((reqq.Decision = "Not Decided")) {
+      return res.status(400).json({ error: "Request already sent" });
+    }
+  }
   if (!req.file) {
     return res.status(400).json({ error: "No image file provided" });
   }
@@ -152,6 +160,7 @@ app.post("/addRequest", upload.single("image"), async (req, res) => {
       referralCode,
       package,
       Image: imageLink,
+      amount,
     });
     await newRequest.save();
     return res.status(200).json({ message: "Image uploaded successfully" });

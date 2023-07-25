@@ -4,6 +4,7 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Cookies from "js-cookie";
 const PortalSlider = ({ images, onClose, product }) => {
+  const [error, setError] = useState(null);
   const userData = Cookies.get("user");
   var currentUser = JSON.parse(userData);
   const sliderSettings = {
@@ -25,6 +26,7 @@ const PortalSlider = ({ images, onClose, product }) => {
   };
 
   const handleSubmit = async () => {
+    console.log(product);
     if (selectedFile) {
       // console.log(currentUser, selectedFile);
 
@@ -39,22 +41,28 @@ const PortalSlider = ({ images, onClose, product }) => {
       formData.append("image", selectedFile, selectedFile.name);
       formData.append("email", currentUser.email);
       formData.append("referralCode", currentUser.referralCode);
-      formData.append("package", currentUser.package);
+      formData.append("package", product.title);
+      formData.append("amount", product.dollar);
+
       console.log(formData);
       try {
-        fetch("http://localhost:5000/addRequest", {
+        const response = await fetch("http://localhost:5000/addRequest", {
           method: "POST",
           body: formData,
-        })
-          .then((response) => response.json())
-          .then((data) => {
-            console.log("Image uploaded successfully!", data);
-          })
-          .catch((error) => {
-            console.error("Error uploading image:", error);
-          });
+        });
+
+        if (!response.ok) {
+          // If the response status is not in the range 200-299, it means an error occurred
+          const responseData = await response.json();
+          throw new Error(responseData.error || "Error uploading image");
+        }
+
+        const data = await response.json();
+        console.log("Image uploaded successfully!", data);
       } catch (error) {
-        console.error("Error:", error);
+        console.error("Error uploading image:", error);
+        setError(error.message || "Error uploading image");
+
         // Handle the error appropriately (e.g., show an error message to the user)
       }
       setSelectedFile(null);
@@ -134,6 +142,11 @@ const PortalSlider = ({ images, onClose, product }) => {
           </button>
         </div>
       </div>
+      {error && (
+        <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-red-600 text-white font-semibold px-4 py-2 rounded-md z-50">
+          {error}
+        </div>
+      )}
     </div>
   );
 };
